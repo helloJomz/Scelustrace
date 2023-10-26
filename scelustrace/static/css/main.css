@@ -1,0 +1,37 @@
+/* FONT */
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+
+.font-space {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+
+/* HOVER */
+.hover-lighten {
+    mix-blend-mode: lighten;
+}
+
+
+/* APP */
+
+.border-light {
+    border-bottom: 1px solid #d3d3d3;
+}
+
+
+
+/* TRANSITION ANIMATION FOR SIGNUP AND LOGIN */
+
+/* Optional: Add custom styles to the animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+/* Apply the animation and its properties */
+.animate-opacity {
+animation: fadeIn 1s ease-in-out forwards; /* Adjust the duration and timing function as needed */
+}
+  

@@ -1,0 +1,95 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scelustrace | {% block 'title' %}Title{% endblock %}</title>
+
+    <!-- DEPENDENCIES -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'img/black_secondary_logo.png' %}" sizes="32x32">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    
+
+</head>
+
+<body class="min-h-screen bg-white ">
+
+    {% include 'partials/_app-sidebar.html' %}
+    {% include 'partials/_app-navbar.html' %}
+
+    <div class="px-[1rem] text-xs flex space-x-2 mb-[1.1875rem] font-inter">
+            
+        <div class="flex space-x-2 text-[#8F8F8F]">
+            <img src="{% static 'img/gray_ml_logo.png' %}" alt="ml" class="w-[1rem] h-[1rem]" >
+            <span>/</span>
+        </div>
+
+        <div class="flex space-x-2 text-[#8F8F8F]">
+            <span>{% block 'ml_num' %}Machine Learning #{% endblock  %}</span>
+            <span>/</span>
+        </div>
+
+        <div class="flex space-x-2 text-[#800080]">
+            <span class="font-semibold">{% block 'model' %}Model Name{% endblock  %}</span>
+        </div>
+    </div>
+
+
+    <div id="container" class="w-full grid grid-cols-1 lg:grid-cols-4 gap-5 lg:gap-0 ">
+
+        <main class="
+            col-span-2 
+            order-none 
+            px-[1rem]"
+        >
+
+
+            <div class="font-space flex flex-col mb-[3rem]">
+                <h3 class="font-bold text-[#800080] text-2xl">{% block 'model_title' %}Model Name{% endblock  %}</h3>
+                <span class="font-inter text-[#8F8F8F] text-[0.7rem]">{% block 'algorithm_type' %}Algorithm Type{% endblock  %}</span>
+            </div>
+
+            {% block main %}{% endblock main %}
+
+        </main>
+
+        <div id="sidebar-1" class="
+            col-span-1
+            px-[1rem]
+            hidden
+            lg:block lg:order-first"
+        >
+
+            {% block sidebar1 %}{% endblock sidebar1 %}
+
+        </div>
+
+        
+        <div id="sidebar-2" class="
+            bg-white
+            col-span-1
+            px-[1rem]
+            order-last"
+        >
+
+            {% block sidebar2 %}{% endblock sidebar2 %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
+

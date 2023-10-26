@@ -1,0 +1,142 @@
+{%load static %}
+
+<div class="hidden sidebar  w-full h-screen absolute flex  overflow-hidden">
+    
+    <div class="bg-black bg-opacity-50 w-[50%] outside-sidebar z-[50]">
+
+    </div>
+
+    <div class="w-[50%] h-screen bg-white opacity-100 p-[1rem]  inside-sidebar z-[100]">
+        <div class="h-[20%] border-light p-0 content opacity-0 animate-opacity">
+            <div class="">
+                <div class=" flex justify-between w-full close-sidebar cursor-pointer">
+                    <div class="flex space-x-3 items-center">
+                        <img src="{%static 'img/close-square-svgrepo-com (1).png' %}" alt="close" class="w-[2.25rem] h-[2.25rem]">
+                        <p class="font-space text-base font-bold ">Close</p>
+                    </div>
+                    
+                    <div class="flex items-center">
+                     
+                        <p class="
+                            {% if request.session.status == False %} text-green-600 {% else %} text-yellow-600 {% endif %}
+                            text-sm
+                        ">
+                            {% if request.session.status == False %}Member{% else %}Admin{% endif %}</p>
+                        </p>
+                        
+                    </div>
+
+                </div>
+            </div>
+    
+            <div class="py-[1.5rem] flex space-x-3 items-center">
+                <div class="">
+                    <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[5rem] h-[5rem] object-cover">
+                </div>
+    
+                <div class="flex flex-col">
+                    <p class="font-space text-base font-bold m-0">{{request.session.user_fullname | title }}</p>
+                    <span class="font-space text-blue-600 text-xs">@{{request.session.username}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="py-[1rem] content opacity-0 animate-opacity">
+            <p class="font-inter text-xs font-bold m-0 text-[#8F8F8F]">Menu</p>
+        </div>
+
+
+        <div class="w-full h-[75%] flex flex-col content opacity-0 animate-opacity">
+
+            
+            <div class="flex flex-col space-y-5">
+
+                {% if request.session.status == True %}
+                    <div class="font-space bg-yellow-400 rounded-md h-[4rem] py-[1rem] px-[1.5rem] flex space-x-5 
+                                items-center cursor-pointer hover:bg-yellow-300">
+                        <img src="{% static 'img/tools-f-svgrepo-com.png' %}" alt="admin" class="w-[2rem] h-[2rem]">
+                        <p class=" text-base ">Admin Dashboard</p>
+                    </div>
+                {% endif %}
+
+                <div class="w-full h-[30%] rounded-lg p-[1rem] flex space-x-3
+                    {% if 'classification' in request.path or 'app/' in request.path  %}
+                        bg-[#fae6fc]
+                    {% else %}
+                        bg-[#F4F4F4]
+                        hover:bg-[#d9dbdb]
+                    {% endif %}
+                " 
+                onclick="window.location.href = '/app/';"
+                >
+
+                    <img src="{% static 'img/classification_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+                    
+                    <div>
+                        <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 1</span>
+                        <p class="font-space text-base font-bold m-0">Crime Classification</p>
+                    </div>
+                </div>
+        
+                <div class="w-full h-[30%] rounded-lg p-[1rem] flex space-x-3
+                    {% if 'clustering' in request.path %}
+                        bg-[#fae6fc]
+                    {% else %}
+                        bg-[#F4F4F4]
+                        hover:bg-[#d9dbdb]
+                    {% endif %}
+                " 
+                onclick="window.location.href = '/app/clustering';"
+                >
+                    <img src="{% static 'img/clustering_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+                    
+                    <div>
+                        <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 2</span>
+                        <p class="font-space text-base font-bold m-0">Clustering Algorithm</p>
+                    </div>
+                </div>
+        
+                <div class="w-full h-[30%] rounded-lg p-[1rem] flex space-x-3
+                    {% if 'analytics' in request.path %}
+                        bg-[#fae6fc]
+                    {% else %}
+                        bg-[#F4F4F4]
+                        hover:bg-[#d9dbdb]
+                    {% endif %}
+                " 
+                onclick="window.location.href = '/app/analytics';"
+                >
+                    <img src="{% static 'img/analytics_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+                    
+                    <div>
+                        <span class="font-inter text-[#8F8F8F] text-xs">Hotspot Report</span>
+                        <p class="font-space text-base font-bold m-0">Crime Analytics</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <form action=" {% url 'signout' %} " method="POST">
+                    {% csrf_token %}
+
+                    <button class="font-space w-full h-[4.3125rem] bg-[#F4F4F4] rounded-lg p-[1rem] flex space-x-3 items-center mb-[1rem]">
+                        <img src="{%static 'img/logout-3-svgrepo-com.png' %}" alt="close" class="w-[2.25rem] h-[2.25rem]">
+                        <p class="font-space text-base font-bold m-0">Sign out</p>
+                    </button> 
+
+                </form>
+                <div class="">
+                    <span class="font-inter text-[#8F8F8F] text-xs">© 2023 Tracer NU Manila, All rights reserved.</span>
+                </div>
+            </div>
+        </div>
+        
+
+     
+        </div>
+        
+    </div>
+
+    <script src="{% static 'js/sidebar.js' %}"></script>
+
+</div>

@@ -1,0 +1,263 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block 'title' %}Naive Bayes{% endblock %}
+{% block 'ml_num' %}Machine Learning 1{% endblock %}
+{% block 'model' %}Naive Bayes{% endblock %}
+{% block 'model_title' %}Naive Bayes{% endblock %}
+{% block 'algorithm_type' %}Classification Algorithm{% endblock %}
+
+{% block sidebar1 %}
+    <div class=" grid grid-cols-1 gap-5">
+        
+
+        <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer
+            {% if 'classification' in request.path or 'app/' in request.path  %}
+                bg-[#fae6fc]
+            {% else %}
+                bg-[#F4F4F4]
+                hover:bg-[#d9dbdb]
+            {% endif %}
+            " 
+             onclick="window.location.href = '/app/classification';">
+
+            <img src="{% static 'img/classification_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+            
+            <div>
+                <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 1</span>
+                <p class="font-space text-base font-bold m-0">Crime Classification</p>
+            </div>
+        </div>
+
+        <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
+            {% if 'clustering' in request.path  %}
+                bg-[#fae6fc]
+            {% else %}
+                bg-[#F4F4F4]
+                hover:bg-[#d9dbdb]
+            {% endif %}
+            " 
+            
+            onclick="window.location.href = '/app/clustering';">
+            <img src="{% static 'img/clustering_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+            
+            <div>
+                <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 2</span>
+                <p class="font-space text-base font-bold m-0">Clustering Algorithm</p>
+            </div>
+        </div>
+
+        <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
+            {% if 'analytics' in request.path  %}
+                bg-[#fae6fc]
+            {% else %}
+                bg-[#F4F4F4]
+                hover:bg-[#d9dbdb]
+            {% endif %}
+            " 
+        
+            onclick="window.location.href = '/app/analytics';">
+            <img src="{% static 'img/analytics_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+            
+            <div>
+                <span class="font-inter text-[#8F8F8F] text-xs">Hotspot Report</span>
+                <p class="font-space text-base font-bold m-0">Crime Analytics</p>
+            </div>
+        </div>
+
+        
+
+    </div>
+
+    <div class="font-inter pt-[2rem]">
+        <div class="p-[1.5rem] border border-solid border-1 border-[#D3D3D3] rounded-lg ">
+            <div class="flex space-x-3 items-center ">
+                <img src="{% static 'img/security-protection-fingerprint-identity-crime-svgrepo-com.png' %}" alt="" class="w-[1rem] h-[1rem] mt-[-3px]">
+                <p class="font-space text-base font-bold m-0">Crime Classification</p>
+            </div>
+
+            <div class="py-[1.5rem] text-sm">
+                Crime Classification by <span class="text-[#800080]">THOMAS & PAULK, P.A.</span> from The <a href="#" class="underline underline-offset-4">6 Types of Criminal Offenses</a>.
+            </div>
+
+            <div class="overflow-y-auto h-[19rem] pr-[1.5rem] text-sm space-y-5">
+                {% include 'partials/_app-list-crimes.html' %}
+            </div>
+
+        </div>
+
+        <div>
+            <span class="text-[0.6rem]">© 2023 Tracer NU Manila, All rights reserved.</span>
+        </div>
+    </div>
+{% endblock sidebar1 %}
+
+
+
+
+
+
+
+{% block main %}
+
+    <div>
+        <div class="relative">
+            <div class="border border-solid border-1 
+                border-[#D3D3D3] rounded-lg h-[25rem]">
+
+                <div id="editable-div" contenteditable="true" class="h-[80%] w-full overflow-y-auto whitespace-pre-wrap 
+                cursor-text font-inter text-base focus:outline-none p-5">
+                    This is an editable div. You can type or paste text here.
+                </div>
+
+                <div class="flex justify-center px-3 ">
+
+                    
+                    
+                    <div class="mt-5 flex items-center space-x-7">
+                        
+                        <div >
+                            <button class="font-inter bg-none text-black underline underline-offset-4 rounded-lg w-fit
+                            select-none py-[0.2rem] px-[0.5rem] text-sm hover:text-[#8F8F8F]">
+                                Clear All 
+                            </button>
+                        </div>
+
+                        <button class="font-space bg-[#D600D6] text-white rounded-lg py-[0.7rem] px-[1rem]
+                        select-none cursor-pointer  flex space-x-2 justify-center hover:bg-[#ff5cff]">
+
+                            <img src="{% static 'img/search-alt-svgrepo-com.png' %}" alt="predict" class="w-[1.3rem] h-[1.3rem]">
+                            <p> Predict </p>
+                        </button>
+
+
+                    </div>
+                </div>
+
+               
+            </div>
+
+            <div class="absolute bottom-0 right-0 mb-3 right-5 text-sm select-none font-semibold">
+                <div class="text-blue-600">
+                <p id="word-count" class="">0 Words</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="my-6">
+
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="font-space font-semibold m-0 text-[#8F8F8F] m-0 p-0">Result</h1>
+                </div>
+
+                <div>
+                    <button class="font-inter bg-none text-black underline underline-offset-4 rounded-lg w-fit
+                        select-none py-[0.2rem] px-[0.5rem] text-sm hover:text-[#8F8F8F]">
+                        clear result
+                    </button>
+                </div>
+            </div>
+            
+            <div class="my-5">
+                <div class="bg-[#EDF1F2] w-2/3 h-[10rem] p-5 space-y-4 rounded-lg">
+                    <div>
+                        <span class="rounded-lg bg-red-600 py-[0.2rem] px-[0.5rem] text-white font-space w-fit text-center text-sm select-none">Violent Crime</span>
+                    </div>
+
+                    <div class="h-[70%] overflow-y-auto text-sm ">
+                        <span class="italic">Encompasses actions causing physical harm or emotional distress to individuals, including assault, 
+                            battery, robbery, child abuse, kidnapping, sexual assault, manslaughter, murder, and violation of safety measures.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+        
+    
+
+    <script src="{% static 'js/classification.js' %}"></script>
+{% endblock main %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block sidebar2 %}
+
+    <div class="flex flex-col h-full gap-8 ">
+        <div class="h-full lg:h-[25%] border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem] space-y-1">
+            <div class="flex justify-between items-center">
+                <div class="font-space font-bold flex space-x-3 items-center">
+                    <img src="{% static 'img/black_ml.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                    <p class="m-0 text-base">Model:</p>
+                </div>
+                
+                <div class="font-inter text-xs">
+                    <span>Naive Bayes</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <div class="font-space font-bold flex space-x-3 items-center">
+                    <img src="{% static 'img/dataset_logo.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                    <p class="m-0 text-base">Dataset:</p>
+                </div>
+                
+                <div class="font-inter text-xs">
+                    <span>gmanews.csv</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <div class="font-space font-bold flex space-x-3 items-center">
+                    <img src="{% static 'img/dataset_count.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                    <p class="m-0 text-base">Dataset Count:</p>
+                </div>
+                
+                <div class="font-inter text-xs">
+                    <span>2500</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <div class="font-space font-bold flex space-x-3 items-center">
+                    <img src="{% static 'img/dumbell.png' %}" alt="" class="w-[1rem] h-[1rem] object-fit">
+                    <p class="m-0 text-base">Training Size:</p>
+                </div>
+                
+                <div class="font-inter text-xs">
+                    <span>90%</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <div class="font-space font-bold flex space-x-3 items-center">
+                    <img src="{% static 'img/dumbell.png' %}" alt="" class="w-[1rem] h-[1rem] object-fit">
+                    <p class="m-0 text-base">Test Size:</p>
+                </div>
+                
+                <div class="font-inter text-xs">
+                    <span>10%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-full border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem]">
+            asdas
+        </div>
+    </div>
+{% endblock sidebar2 %}
+

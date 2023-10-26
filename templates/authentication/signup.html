@@ -1,0 +1,115 @@
+{% extends 'auth_base.html' %}
+
+{% load static %}
+
+{% block title %}
+  Signup
+{% endblock %}
+
+{% block login_hero %}
+<img src="{%static 'img/signup_hero_dog.png' %}" alt="" class="hidden content opacity-0 animate-opacity absolute right-0 bottom-10 z-10 w-[45rem] xl:right-20 lg:block xl:w-[55rem]  ">
+{% endblock login_hero %}
+
+{% block signup_form %}
+
+  <form id="signup_user" method="POST">
+    <h1 class="font-space text-white font-bold text-4xl xl:text-5xl">Create your Account {{ message }}</h1>
+
+    <p class="text-[#898889] py-4 font-inter">Please fill all the fields below to create your account.</p>
+
+    <div class="flex flex-col gap-4 font-inter pb-4">
+      <div class="relative">
+        <input type="text" name="username" placeholder="Username" class="w-full h-[3rem] lg:h-[4rem] rounded text-[#898889] bg-[#222122] py-[0.5rem] pl-[2rem] pr-[2.7rem] text-sm md:text-base" />
+
+        <div id="usernameSuccessIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+          <span class="material-symbols-outlined text-[1.3rem] text-green-600 my-auto h-full">check_circle</span>
+        </div>
+
+        <div id="usernameErrorIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+          <span class="material-symbols-outlined text-[1.3rem] text-red-600 my-auto h-full">error</span>
+        </div>
+      </div>
+
+      {% comment '' %}username error{% endcomment %}
+      <div id="usernameErrorAlert" class="hidden flex flex-col bg-red-200 rounded w-full px-[2rem] py-[0.5rem]">
+      </div>
+
+      <div class="flex gap-1">
+        <div class="relative w-full">
+          <input type="text" name="firstname" placeholder="Firstname" class="w-full h-[3rem] lg:h-[4rem] rounded text-[#898889] bg-[#222122] py-[0.5rem] pl-[2rem] pr-[2.7rem] text-sm md:text-base" />
+
+          <div id="firstnameSuccessIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+            <span class="material-symbols-outlined text-[1.3rem] text-green-600 my-auto h-full">check_circle</span>
+          </div>
+
+          <div id="firstnameErrorIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+            <span class="material-symbols-outlined text-[1.3rem] text-red-600 my-auto h-full">error</span>
+          </div>
+        </div>
+
+        <div class="relative w-full">
+          <input type="text" name="lastname" placeholder="Lastname" class="w-full h-[3rem] lg:h-[4rem] rounded text-[#898889] bg-[#222122] py-[0.5rem] pl-[2rem] pr-[2.7rem] text-sm md:text-base" />
+
+          <div id="lastnameSuccessIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+            <span class="material-symbols-outlined text-[1.3rem] text-green-600 my-auto h-full">check_circle</span>
+          </div>
+
+          <div id="lastnameErrorIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+            <span class="material-symbols-outlined text-[1.3rem] text-red-600 my-auto h-full">error</span>
+          </div>
+        </div>
+      </div>
+
+      {% comment '' %}name error{% endcomment %}
+      <div id="nameErrorAlert" class="hidden flex flex-col bg-red-200 rounded w-full px-[2rem] py-[0.5rem]">
+      </div>
+
+      <div class="relative">
+        <input type="password" name="password" placeholder="Password" class="w-full h-[3rem] lg:h-[4rem] rounded text-[#898889] bg-[#222122] py-[0.5rem] pl-[2rem] pr-[3rem] text-sm md:text-base" />
+        
+        <div id="passwordSuccessIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+          <span class="material-symbols-outlined text-[1.3rem] text-green-600 my-auto h-full">check_circle</span>
+        </div>
+
+        <div id="passwordErrorIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+          <span class="material-symbols-outlined text-[1.3rem] text-red-600 my-auto h-full">error</span>
+        </div>
+
+      </div>
+
+      {% comment '' %}password error{% endcomment %}
+      <div id="passwordErrorAlert" class="hidden flex flex-col bg-red-200 rounded w-full px-[2rem] py-[0.5rem]">
+      </div>
+
+      <div class="relative">
+        <input type="password" name="cpassword" placeholder="Confirm Password" class="w-full h-[3rem] lg:h-[4rem] rounded text-[#898889] bg-[#222122] py-[0.5rem] pl-[2rem] pr-[3rem] text-sm md:text-base" />
+        
+        <div id="cpasswordSuccessIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+          <span class="material-symbols-outlined text-[1.3rem] text-green-600 my-auto h-full">check_circle</span>
+        </div>
+
+        <div id="cpasswordErrorIcon" class="hidden absolute top-[30%] lg:top-[35%] xl:top-[36%] right-0 flex justify-end items-center pr-[1rem]">
+          <span class="material-symbols-outlined text-[1.3rem] text-red-600 my-auto h-full">error</span>
+        </div>
+
+      </div>
+
+      {% comment '' %}cpassword error{% endcomment %}
+      <div id="cpasswordErrorAlert" class="hidden flex flex-col bg-red-200 rounded w-full px-[2rem] py-[0.5rem]">
+      </div>
+
+    </div>
+
+    <button type="button" onclick="signup_user()" class="h-[4.5rem] w-full bg-gradient-to-r from-purple-900 to-purple-500 rounded flex items-center justify-between px-[2rem] text-white font-inter cursor-pointer hover:bg-gradient-to-r hover:from-purple-700 hover:to-purple-400 text-sm md:text-base">
+      <p class="m-0">Create your account</p>
+      <img src="{% static 'img/login_arrow.svg' %}" alt="arrow" class="w-[1rem] lg:w-[1.25rem]" />
+    </button>
+
+    <div class="pt-4 flex space-x-1 font-inter text-[0.75rem]">
+      <p class="m-0 text-[#898889]">Already have an account?</p>
+      <a href="{% url 'login' %}" class="text-white bold hover:font-extrabold">Login here.</a>
+    </div>
+
+    <script src="{% static 'js/signup.js' %}"></script>
+  </form>
+{% endblock %}

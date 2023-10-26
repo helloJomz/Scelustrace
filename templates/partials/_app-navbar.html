@@ -1,0 +1,78 @@
+
+{%load static %}
+
+<nav class="w-full  bg-white px-[1rem] py-[1.5rem] border-light mb-[1.1875rem] z-[50]">
+
+    <div class="w-full flex justify-between items-center">
+        <div class="mt-[0.6rem]">
+            <img src="{%static 'img/black_secondary_logo.png' %}" alt="logo" class="w-full lg:hidden mt-[-8px]">
+            <img src="{%static 'img/black_primary_logo.png' %}" alt="logo" class="w-full hidden lg:block mt-[-8px]">
+        </div>
+    
+        <div class="w-[20%] flex justify-end cursor-pointer menu-sidebar lg:hidden">
+            <img src="{%static 'img/menu-dots-square-svgrepo-com.png' %}" alt="menu" class="w-[2.25rem] h-[2.25rem]">
+        </div>
+
+        <div class="hidden lg:block lg:relative ">
+            <div class="lg:flex space-x-3 items-center bg-[#EDF1F2] pl-[1rem] pr-[0.4rem] py-[0.3rem] rounded-[3rem] cursor-pointer hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
+                <div>
+                    <p class="font-space text-base font-bold m-0 ">{{ request.session.user_fullname | title }}</p>
+                </div>
+                <div>
+                    <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[2rem] h-[2rem] object-cover ">
+                </div>
+            </div>
+            
+            <div class="hidden absolute bg-[#EDF1F2] rounded-lg w-full mt-2 p-[1rem] shadow-sm desktop-menu select-none">
+                <div class="h-[50%]">
+                    <div class="flex flex-col space-y-3 font-space ">
+
+                        <div class="text-xs mb-2 ">
+                            <p class="text-blue-600">@{{request.session.username}}</p>
+                            <div class="flex space-x-1">
+                                <p>Status:</p>
+                                <p class="
+                                {% if request.session.status == False %} text-green-600 {% else %} text-yellow-600 {% endif %}
+                            ">{% if request.session.status == False %}Member{% else %}Admin{% endif %}</p>
+                            </div>
+                            
+                        </div>
+
+                        {% if request.session.status == True %}
+                            <div class="bg-yellow-400 rounded-md py-[0.3rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer hover:bg-yellow-300">
+                                <p class="m-0 text-sm">Admin Dashboard</p>
+                            </div>
+                        {% endif %}
+    
+                        <div class="bg-[#E5E4E2] hover:brightness-90 rounded-md py-[0.2rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer ">
+                            <img src="{% static 'img/profile-default-svgrepo-com.png' %}" alt="profile" class="w-[1.2rem] h-[1.2rem]">
+                            <p class="m-0 text-base">Profile</p>
+                        </div>
+                
+                        <div class="bg-[#E5E4E2] hover:brightness-90 rounded-md py-[0.2rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer">
+                            <img src="{% static 'img/settings-2-svgrepo-com.png' %}" alt="profile" class="w-[1.2rem] h-[1.2rem]">
+                            <p class="m-0 text-base">Settings</p>
+                        </div>
+                    </div>
+                    
+                    <form action=" {% url 'signout' %} " method="POST">
+                        {% csrf_token %}
+
+                        <button type="submit" class="w-full hover:brightness-90 font-space mt-8 bg-[#E5E4E2] rounded-md py-[0.2rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer">
+                            <img src="{%static 'img/logout-3-svgrepo-com.png' %}" alt="close" class="w-[1.3rem] h-[1.3rem]">
+                            <p class="m-0 text-base">Sign out</p>
+                        </button>
+                    </form>
+
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+    </div>
+
+
+    <script src="{% static 'js/sidebar.js' %}"></script>
+</nav>
