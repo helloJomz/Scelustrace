@@ -112,19 +112,17 @@
 
                 <div class="flex justify-center px-3 ">
 
-                    
-                    
                     <div class="mt-5 flex items-center space-x-7">
                         
                         <div >
-                            <button class="font-inter bg-none text-black underline underline-offset-4 rounded-lg w-fit
+                            <button id="clearall-btn" class="font-inter bg-none text-black underline underline-offset-4 rounded-lg w-fit
                             select-none py-[0.2rem] px-[0.5rem] text-sm hover:text-[#8F8F8F]">
                                 Clear All 
                             </button>
                         </div>
 
-                        <button class="font-space bg-[#D600D6] text-white rounded-lg py-[0.7rem] px-[1rem]
-                        select-none cursor-pointer  flex space-x-2 justify-center hover:bg-[#ff5cff]">
+                        <button id="predict-btn" class="font-space bg-[#D600D6] text-white rounded-lg py-[0.7rem] px-[1rem]
+                        select-none cursor-pointer flex space-x-2 justify-center hover:bg-[#ff5cff]">
 
                             <img src="{% static 'img/search-alt-svgrepo-com.png' %}" alt="predict" class="w-[1.3rem] h-[1.3rem]">
                             <p> Predict </p>
@@ -153,21 +151,21 @@
                 </div>
 
                 <div>
-                    <button class="font-inter bg-none text-black underline underline-offset-4 rounded-lg w-fit
+                    <button id="clear-result-btn" class="font-inter bg-none text-black underline underline-offset-4 rounded-lg w-fit
                         select-none py-[0.2rem] px-[0.5rem] text-sm hover:text-[#8F8F8F]">
                         clear result
                     </button>
                 </div>
             </div>
             
-            <div class="my-5">
+            <div class="hidden my-5" id="result_container">
                 <div class="bg-[#EDF1F2] w-2/3 h-[10rem] p-5 space-y-4 rounded-lg">
                     <div>
-                        <span class="rounded-lg bg-red-600 py-[0.2rem] px-[0.5rem] text-white font-space w-fit text-center text-sm select-none">Violent Crime</span>
+                        <span id="predicted_label" class="rounded-lg bg-red-600 py-[0.2rem] px-[0.5rem] text-white font-space w-fit text-center text-sm select-none">Violent Crime</span>
                     </div>
 
                     <div class="h-[70%] overflow-y-auto text-sm ">
-                        <span class="italic">Encompasses actions causing physical harm or emotional distress to individuals, including assault, 
+                        <span id="crime_desc" class="italic">Encompasses actions causing physical harm or emotional distress to individuals, including assault, 
                             battery, robbery, child abuse, kidnapping, sexual assault, manslaughter, murder, and violation of safety measures.</span>
                     </div>
                 </div>

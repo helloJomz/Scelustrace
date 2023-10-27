@@ -9,23 +9,12 @@
     <div class="w-[50%] h-screen bg-white opacity-100 p-[1rem]  inside-sidebar z-[100]">
         <div class="h-[20%] border-light p-0 content opacity-0 animate-opacity">
             <div class="">
-                <div class=" flex justify-between w-full close-sidebar cursor-pointer">
+                <div class="w-full close-sidebar cursor-pointer">
                     <div class="flex space-x-3 items-center">
                         <img src="{%static 'img/close-square-svgrepo-com (1).png' %}" alt="close" class="w-[2.25rem] h-[2.25rem]">
                         <p class="font-space text-base font-bold ">Close</p>
                     </div>
-                    
-                    <div class="flex items-center">
-                     
-                        <p class="
-                            {% if request.session.status == False %} text-green-600 {% else %} text-yellow-600 {% endif %}
-                            text-sm
-                        ">
-                            {% if request.session.status == False %}Member{% else %}Admin{% endif %}</p>
-                        </p>
-                        
-                    </div>
-
+                
                 </div>
             </div>
     
@@ -34,9 +23,26 @@
                     <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[5rem] h-[5rem] object-cover">
                 </div>
     
-                <div class="flex flex-col">
+                <div class="flex flex-col space-y-1">
                     <p class="font-space text-base font-bold m-0">{{request.session.user_fullname | title }}</p>
-                    <span class="font-space text-blue-600 text-xs">@{{request.session.username}}</span>
+                    
+                    <div class="font-space">
+                        <div class="flex space-x-1">
+                            {% if request.session.status == False %} 
+                                <img src="{% static 'img/user-id-svgrepo-com.png' %}" alt="admin" class="w-[1rem] h-[1rem]"> 
+                            {% else %} 
+                                <img src="{% static 'img/admin-svgrepo-com.png' %}" alt="admin" class="w-[1rem] h-[1rem]"> 
+                            {% endif %}
+                            
+                            <p class="
+                                {% if request.session.status == False %} text-green-600 {% else %} text-yellow-600 {% endif %}
+                                text-xs
+                                ">
+                                {% if request.session.status == False %}Member{% else %}Admin{% endif %}</p>
+                            </p>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
