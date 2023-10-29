@@ -9,6 +9,10 @@ joblib = "*"
 imblearn = "*"
 pandas = "*"
 matplotlib = "*"
+psycopg2-binary = "*"
+dj-database-url = "*"
+django-environ = "*"
+gunicorn = "*"
 
 [dev-packages]
 
