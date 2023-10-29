@@ -1,0 +1,58 @@
+{% load static %}
+
+<div class=" grid grid-cols-1 gap-5">
+        
+    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer
+        {% if 'classification' in request.path %}
+            bg-[#fae6fc]
+        {% else %}
+            bg-[#F4F4F4]
+            hover:bg-[#d9dbdb]
+        {% endif %}
+        " 
+        onclick="window.location.href = '/app/classification';">
+
+        <img src="{% static 'img/classification_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+        
+        <div>
+            <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 1</span>
+            <p class="font-space text-base font-bold m-0">Crime Classification</p>
+        </div>
+    </div>
+
+    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
+        {% if 'clustering' in request.path  %}
+            bg-[#fae6fc]
+        {% else %}
+            bg-[#F4F4F4]
+            hover:bg-[#d9dbdb]
+        {% endif %}
+        " 
+        
+        onclick="window.location.href = '/app/clustering';">
+        <img src="{% static 'img/clustering_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+        
+        <div>
+            <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 2</span>
+            <p class="font-space text-base font-bold m-0">Clustering Algorithm</p>
+        </div>
+    </div>
+
+    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
+        {% if 'analytics' in request.path  %}
+            bg-[#fae6fc]
+        {% else %}
+            bg-[#F4F4F4]
+            hover:bg-[#d9dbdb]
+        {% endif %}
+        " 
+    
+        onclick="window.location.href = '/app/analytics';">
+        <img src="{% static 'img/analytics_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
+        
+        <div>
+            <span class="font-inter text-[#8F8F8F] text-xs">Hotspot Report</span>
+            <p class="font-space text-base font-bold m-0">Crime Analytics</p>
+        </div>
+    </div>
+</div>

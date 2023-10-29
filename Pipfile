@@ -8,6 +8,7 @@ django = "*"
 joblib = "*"
 imblearn = "*"
 pandas = "*"
+matplotlib = "*"
 
 [dev-packages]
 
