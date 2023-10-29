@@ -23,9 +23,9 @@ class ClassificationView(LoginRequiredMixin, View):
     def post(self, request):
 
         # imports model and features
-        tfidf_vectorizer    = load('./scelustrace/static/models/tfidf-vectorizer.joblib')
-        nb_classifier       = load('./scelustrace/static/models/naive-bayes.joblib')
-        label_encoder       = load('./scelustrace/static/models/label-encoder.joblib')
+        tfidf_vectorizer    = load('./static/models/tfidf-vectorizer.joblib')
+        nb_classifier       = load('./static/models/naive-bayes.joblib')
+        label_encoder       = load('./static/models/label-encoder.joblib')
 
         content             = request.POST["input_content"]
         input_tfidf         = tfidf_vectorizer.transform([content])
