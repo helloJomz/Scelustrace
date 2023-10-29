@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: scelustrace
+    buildCommand: "./build.sh"
+    env: python
+    startCommand: "gunicorn scelustrace.wsgi:application"

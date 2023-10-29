@@ -57,7 +57,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
+
+# make sure the below lines also included
+STATIC_URL = 'static/'
+STATIC_ROOT = 'staticfiles'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = 'scelustrace.urls'
 
@@ -138,15 +144,15 @@ USE_TZ = True
 # Base directory of your project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Other settings...
+# # Other settings...
 
-# Additional static file directories
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'scelustrace', 'static'),
-]
+# # Additional static file directories
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'scelustrace', 'static'),
+# ]
 
-# URL prefix for static files
-STATIC_URL = '/static/'
+# # URL prefix for static files
+# STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

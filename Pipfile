@@ -13,6 +13,7 @@ psycopg2-binary = "*"
 dj-database-url = "*"
 django-environ = "*"
 gunicorn = "*"
+whitenoise = "*"
 
 [dev-packages]
 
