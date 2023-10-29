@@ -2,7 +2,7 @@
 $(".menu-sidebar").click(function(){
 
     $(".sidebar").show().css({
-        "position": "absolute",
+        "position": "fixed",
         "display": "flex",
         "justify-content": "end",
     })

@@ -2,19 +2,23 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.http import JsonResponse
 from django.contrib import auth
-from django.contrib.sessions.models import Session
+from .models import ListOfCrimes
 from joblib import load
-from sklearn.metrics import classification_report
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 import pandas as pd
-import os
-from sklearn.naive_bayes import MultinomialNB
-from imblearn.over_sampling import SMOTE
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+import io
+import matplotlib.pyplot as plt
+import base64
 
-
-# Create your views here.
-class ClassificationView(View):
+class ClassificationView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, 'app/classification.html')
+        list_of_crimes = ListOfCrimes.objects.all()
+        
+        return render(request, 'app/classification.html', context={'data':list_of_crimes})
 
     def post(self, request):
 
@@ -29,48 +33,102 @@ class ClassificationView(View):
         y_pred_label        = label_encoder.inverse_transform(y_pred)
         predicted_label     = y_pred_label[0] if y_pred_label else ''
 
-        result = {}  # Default assignment
+        result = {}  
+        list_of_crimes = ListOfCrimes.objects.all()
 
-        if predicted_label == 'Cybercrime':
-            result = {
-                'predicted_label': 'Cybercrime',
-                'bg_color': '#1434A4',
-                'desc': 'Refers to an illegal activity committed through the use of computers, mobile phones, or any other device that can be used by means of technology. Some of its various forms are identity theft, hacking websites or networks, spreading fake news, video pornography, infringing copyright, selling illegal items, online scamming, and phishing, in which fraudulent email messages or SMS are used to steal personal information.',
-            }
-        elif predicted_label == 'Property Crime':
-            result = {
-                'predicted_label': 'Property Crime',
-                'bg_color': '#93C572',
-                'desc': 'Pertains to offenses related to property damage, theft, or destruction, such as shoplifting, theft, arson, property damage, and illegal possession of firearms which can result in imprisonment and fines.',
-            }
-        elif predicted_label == 'Morality Crime':
-            result = {
-                'predicted_label': 'Morality Crime',
-                'bg_color': '#800080',
-                'desc': 'Includes violations of accepted social and moral values rather than harm to individuals or property, encompassing crimes like prostitution, bigamy, illegal gambling, illegal drug use, and indecent exposure.',
-            }
-        elif predicted_label == 'Statutory Crime':
-            result = {
-                'predicted_label': 'Statutory Crime',
-                'bg_color': '#FFC000',
-                'desc': 'Refers to acts prohibited for the betterment and protection of society, including driving under the influence (DUI), drug possession, sale or distribution, public intoxication, selling alcohol to minors, driving without a license, reckless driving, hit and run, illegal importation of goods, and illegal parking.'
-            }
-        elif predicted_label == 'Financial/White Collar Crime':
-            result = {
-                'predicted_label': 'Financial/White Collar Crime',
-                'bg_color': '#FFF5EE',
-                'desc': 'Are financially motivated offenses, often occurring in the business world, which, while nonviolent, can inflict substantial financial losses on individuals and businesses. Examples include embezzlement, forgery, fraud, tax evasion, identity theft, public corruption, healthcare fraud, and election law violations.'
-            }
-        elif predicted_label == 'Violent Crime':
-            result = {
-                'predicted_label': 'Violent Crime',
-                'bg_color': '#DC2626',
-                'desc': 'Encompasses actions causing physical harm or emotional distress to individuals, including assault, battery, robbery, child abuse, kidnapping, sexual assault, manslaughter, murder, and violation of safety measures.'
-            }
-
+        for crime in list_of_crimes:
+            if crime.label_crime == predicted_label:
+                result = {
+                    'predicted_label': crime.label_crime,
+                    'bg_color': crime.bg_color,
+                    'desc': crime.desc
+                }
         return JsonResponse(result)
+    
 
 
+class ClusteringView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'app/clustering.html')
+    
+    def post(self, request):
+        cluster_info = [] #list to store the cluster words
+        dataset_info = {} #dict to store the dataset info
+        chart_image = None
+        wordcloud_images = []  #list to store Word Cloud images 
+
+        if request.method == 'POST':
+            csv_file = request.FILES['csv_file']
+            data = pd.read_csv(csv_file)
+            content_data = data['content']
+            vectorizer = TfidfVectorizer(stop_words='english')
+            X = vectorizer.fit_transform(content_data)
+
+            k = int(request.POST.get('input_k', 0))
+            if k > 0:
+                model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
+                model.fit(X)
+
+                data['cluster'] = model.labels_
+
+                #loop for cluster result w/ 30 feature words
+                for i in range(k):
+                    order_centroids = model.cluster_centers_.argsort()[:, ::-1]
+                    terms = vectorizer.get_feature_names_out()
+                    cluster_words = [terms[j] for j in order_centroids[i, :30]]
+                    cluster_info.append((f'Cluster {i}', cluster_words))
+
+                    # wordcloud result
+                    wordcloud = WordCloud(width=400, height=400, background_color='white')
+                    wordcloud.generate_from_text(' '.join(cluster_words))
+
+                    # save the word cloud as a base64-encoded image
+                    image_data = io.BytesIO()
+                    wordcloud.to_image().save(image_data, format="PNG")
+                    image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
+                    wordcloud_images.append((f'Cluster {i}', image_base64))
+
+                # create and save the bar chart of cluster points
+                plt.bar([x for x in range(k)], data.groupby(['cluster'])['content'].count(), alpha=0.4)
+                plt.title('KMeans cluster points')
+                plt.xlabel("Cluster number")
+                plt.ylabel("Number of points")
+
+                # save the chart as a bytes-like object
+                chart_buffer = io.BytesIO()
+                plt.savefig(chart_buffer, format="png")
+                plt.close()
+
+                # convert the chart to base64 and encode it as a string
+                chart_image = base64.b64encode(chart_buffer.getvalue()).decode('utf-8')
+
+            # store dataset information
+            dataset_info['dataset_name'] = csv_file.name
+            dataset_info['row_count'] = len(data)
+            dataset_info['column_names'] = data.columns.tolist()
+
+        return render(request, 'kmeans.html', {'cluster_info': cluster_info, 'dataset_info': dataset_info, 'chart_image': chart_image, 'wordcloud_images': wordcloud_images})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@login_required
 def logout_and_clear_sessions(request):
     auth.logout(request)  # Logout the user
     request.session.flush()  # Clear all sessions

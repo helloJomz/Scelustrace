@@ -23,13 +23,13 @@
 
 </head>
 
-<body class="min-h-screen bg-white ">
+<body class="h-screen bg-white overflow-none content opacity-0 animate-opacity">
 
     {% include 'partials/_app-sidebar.html' %}
     {% include 'partials/_app-navbar.html' %}
-
+    
     <div class="px-[1rem] text-xs flex space-x-2 mb-[1.1875rem] font-inter">
-            
+                
         <div class="flex space-x-2 text-[#8F8F8F]">
             <img src="{% static 'img/gray_ml_logo.png' %}" alt="ml" class="w-[1rem] h-[1rem]" >
             <span>/</span>
@@ -45,17 +45,16 @@
         </div>
     </div>
 
-
     <div id="container" class="w-full grid grid-cols-1 lg:grid-cols-4 gap-5 lg:gap-0 ">
 
         <main class="
-            col-span-2 
+            col-span-1 lg:col-span-2
             order-none 
-            px-[1rem]"
+            px-[1rem]
+            "
         >
 
-
-            <div class="font-space flex flex-col mb-[3rem]">
+            <div class="font-space flex flex-col mb-[2rem]">
                 <h3 class="font-bold text-[#800080] text-2xl">{% block 'model_title' %}Model Name{% endblock  %}</h3>
                 <span class="font-inter text-[#8F8F8F] text-[0.7rem]">{% block 'algorithm_type' %}Algorithm Type{% endblock  %}</span>
             </div>
@@ -68,10 +67,14 @@
             col-span-1
             px-[1rem]
             hidden
-            lg:block lg:order-first"
+            lg:block lg:order-first
+            "
         >
 
-            {% block sidebar1 %}{% endblock sidebar1 %}
+            {% include 'partials/_app-sidebar-haft.html' %}
+
+            {% block cf_sidebar1 %}{% endblock cf_sidebar1 %}
+            {% block cl_sidebar1 %}{% endblock cl_sidebar1 %}
 
         </div>
 
@@ -80,7 +83,9 @@
             bg-white
             col-span-1
             px-[1rem]
-            order-last"
+            order-last
+            mb-5 lg:mb-0
+            "
         >
 
             {% block sidebar2 %}{% endblock sidebar2 %}

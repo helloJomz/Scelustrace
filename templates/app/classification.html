@@ -7,68 +7,7 @@
 {% block 'model_title' %}Naive Bayes{% endblock %}
 {% block 'algorithm_type' %}Classification Algorithm{% endblock %}
 
-{% block sidebar1 %}
-    <div class=" grid grid-cols-1 gap-5">
-        
-
-        <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer
-            {% if 'classification' in request.path or 'app/' in request.path  %}
-                bg-[#fae6fc]
-            {% else %}
-                bg-[#F4F4F4]
-                hover:bg-[#d9dbdb]
-            {% endif %}
-            " 
-             onclick="window.location.href = '/app/classification';">
-
-            <img src="{% static 'img/classification_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
-            
-            <div>
-                <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 1</span>
-                <p class="font-space text-base font-bold m-0">Crime Classification</p>
-            </div>
-        </div>
-
-        <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
-            {% if 'clustering' in request.path  %}
-                bg-[#fae6fc]
-            {% else %}
-                bg-[#F4F4F4]
-                hover:bg-[#d9dbdb]
-            {% endif %}
-            " 
-            
-            onclick="window.location.href = '/app/clustering';">
-            <img src="{% static 'img/clustering_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
-            
-            <div>
-                <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 2</span>
-                <p class="font-space text-base font-bold m-0">Clustering Algorithm</p>
-            </div>
-        </div>
-
-        <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
-            {% if 'analytics' in request.path  %}
-                bg-[#fae6fc]
-            {% else %}
-                bg-[#F4F4F4]
-                hover:bg-[#d9dbdb]
-            {% endif %}
-            " 
-        
-            onclick="window.location.href = '/app/analytics';">
-            <img src="{% static 'img/analytics_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
-            
-            <div>
-                <span class="font-inter text-[#8F8F8F] text-xs">Hotspot Report</span>
-                <p class="font-space text-base font-bold m-0">Crime Analytics</p>
-            </div>
-        </div>
-
-        
-
-    </div>
-
+{% block cf_sidebar1 %}
     <div class="font-inter pt-[2rem]">
         <div class="p-[1.5rem] border border-solid border-1 border-[#D3D3D3] rounded-lg ">
             <div class="flex space-x-3 items-center ">
@@ -80,29 +19,38 @@
                 Crime Classification by <span class="text-[#800080]">THOMAS & PAULK, P.A.</span> from The <a href="#" class="underline underline-offset-4">6 Types of Criminal Offenses</a>.
             </div>
 
-            <div class="overflow-y-auto h-[19rem] pr-[1.5rem] text-sm space-y-5">
-                {% include 'partials/_app-list-crimes.html' %}
-            </div>
+            <div class="overflow-y-auto h-[19rem] pr-[1.5rem] space-y-5">
+                {% for i in data  %}
+                    <div class="flex flex-col space-y-2">
+                        <span class="rounded-lg bg-[{{i.bg_color}}] p-[0.5rem] text-sm font-space w-fit text-center 
+                        
+                        {% if i.label_crime == 'Financial/White Collar Crime' %}text-black{% else %}text-white {% endif %} 
+                        
+                        ">{{ i.label_crime }}</span>
 
+                        <span class="italic text-xs">{{ i.desc }}</span>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
         <div>
             <span class="text-[0.6rem]">© 2023 Tracer NU Manila, All rights reserved.</span>
         </div>
     </div>
-{% endblock sidebar1 %}
-
-
-
-
-
+{% endblock cf_sidebar1 %}
 
 
 {% block main %}
 
     <div>
         <div class="relative">
-            <div class="border border-solid border-1 
+
+            <div id="errorAlert" class="hidden my-3 text-red-500 text-sm font-inter flex flex-col bg-red-200 rounded-lg w-full px-[2rem] py-[0.5rem]">
+                Please provide input that is not empty and try again.
+            </div>
+
+            <div id="wrapper_textarea" class="border border-solid border-1 
                 border-[#D3D3D3] rounded-lg h-[25rem]">
 
                 <div id="editable-div" contenteditable="true" class="h-[80%] w-full overflow-y-auto whitespace-pre-wrap 
@@ -122,7 +70,7 @@
                         </div>
 
                         <button id="predict-btn" class="font-space bg-[#D600D6] text-white rounded-lg py-[0.7rem] px-[1rem]
-                        select-none cursor-pointer flex space-x-2 justify-center hover:bg-[#ff5cff]">
+                        select-none cursor-pointer flex space-x-2 justify-center hover:bg-[#ff5cff] focus:outline-none">
 
                             <img src="{% static 'img/search-alt-svgrepo-com.png' %}" alt="predict" class="w-[1.3rem] h-[1.3rem]">
                             <p> Predict </p>
@@ -145,7 +93,11 @@
 
         <div class="my-6">
 
-            <div class="flex justify-between items-center">
+            <div id="cf-loading" class="hidden h-[17rem] flex justify-center items-center">
+                <img src="{% static 'img/Ellipsis-1s-200px-unscreen.gif' %}" alt="loading" class="w-[10rem] h-[10rem]">
+            </div>
+
+            <div id="result-menu" class="hidden flex justify-between items-center">
                 <div>
                     <h1 class="font-space font-semibold m-0 text-[#8F8F8F] m-0 p-0">Result</h1>
                 </div>
@@ -159,7 +111,7 @@
             </div>
             
             <div class="hidden my-5" id="result_container">
-                <div class="bg-[#EDF1F2] w-2/3 h-[10rem] p-5 space-y-4 rounded-lg">
+                <div id="result_error_alert" class="hidden bg-[#EDF1F2] w-2/3 h-[12rem] p-5 space-y-4 rounded-lg">
                     <div>
                         <span id="predicted_label" class="rounded-lg bg-red-600 py-[0.2rem] px-[0.5rem] text-white font-space w-fit text-center text-sm select-none">Violent Crime</span>
                     </div>
@@ -169,13 +121,17 @@
                             battery, robbery, child abuse, kidnapping, sexual assault, manslaughter, murder, and violation of safety measures.</span>
                     </div>
                 </div>
+
+                <div id="empty_result" class="hidden w-full h-[20rem] relative text-center space-y-1">
+                    <h1 class="m-0 p-0 absolute text-[#8F8F8F] font-space top-8 text-xl w-full mb-10">Error, no result!</h1>
+                    <img src="{% static 'img/empty_error.gif' %}" alt="empty" class="object-fit w-full lg:w-1/2 h-full mx-auto">
+                </div>
+                
             </div>
 
         </div>
     </div>
         
-    
-
     <script src="{% static 'js/classification.js' %}"></script>
 {% endblock main %}
 
@@ -196,7 +152,7 @@
 {% block sidebar2 %}
 
     <div class="flex flex-col h-full gap-8 ">
-        <div class="h-full lg:h-[25%] border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem] space-y-1">
+        <div class="h-full lg:h-fit border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem] space-y-1">
             <div class="flex justify-between items-center">
                 <div class="font-space font-bold flex space-x-3 items-center">
                     <img src="{% static 'img/black_ml.png' %}" alt="" class="w-[1rem] h-[1rem]">
@@ -253,8 +209,203 @@
             </div>
         </div>
 
-        <div class="h-full border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem]">
-            asdas
+        <div class="h-fit border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem] text-xs ">
+            
+            <div class="mb-7 text-base font-space font-bold flex space-x-3 items-center">
+                <img src="{% static 'img/report-linechart-svgrepo-com.png' %}" alt="report" class="w-[1.3rem] h-[1.3rem]">
+                <p class="m-0">Classification Report</p>
+            </div>
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-5 font-space pb-[0.5rem]">
+                    <div> </div>
+                    <div class="text-center">
+                        <div>Precision</div>
+                    </div>
+                    <div class="text-center">
+                        <div>Recall</div>
+    
+                    </div>
+                    <div class="text-center">
+                        <div>f1-score</div>
+                    </div>
+                    <div class="text-center">
+                        <div>Support</div>
+                    </div>
+                </div>
+    
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Morality Crime</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.59</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.72</div>
+    
+                    </div>
+                    <div class="text-center">
+                        <div>0.65</div>
+                    </div>
+                    <div class="text-center">
+                        <div>18</div>
+                    </div>
+                </div>
+    
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Financial or White Collar Crime</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.74</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.70</div>
+    
+                    </div>
+                    <div class="text-center">
+                        <div>0.72</div>
+                    </div>
+                    <div class="text-center">
+                        <div>20</div>
+                    </div>
+                </div>
+    
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Violent Crime</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.83</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.33</div>
+    
+                    </div>
+                    <div class="text-center">
+                        <div>0.48</div>
+                    </div>
+                    <div class="text-center">
+                        <div>15</div>
+                    </div>
+                </div>
+    
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Property Crime</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.65</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.81</div>
+    
+                    </div>
+                    <div class="text-center">
+                        <div>0.72</div>
+                    </div>
+                    <div class="text-center">
+                        <div>16</div>
+                    </div>
+                </div>
+    
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Statutory Crime</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.86</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.76</div>
+    
+                    </div>
+                    <div class="text-center">
+                        <div>0.81</div>
+                    </div>
+                    <div class="text-center">
+                        <div>50</div>
+                    </div>
+                </div>
+    
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Cybercrime</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.82</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.88</div>
+    
+                    </div>
+                    <div class="text-center">
+                        <div>0.85</div>
+                    </div>
+                    <div class="text-center">
+                        <div>111</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="mt-10 space-y-3">
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Accuracy</div>
+                    </div>
+                    <div>
+                        <div></div>
+                    </div>
+                    <div>
+                        <div></div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.79</div>
+                    </div>
+                    <div class="text-center">
+                        <div>230</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Macro avg</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.75</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.70</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.70</div>
+                    </div>
+                    <div class="text-center">
+                        <div>230</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-5 items-center">
+                    <div>
+                        <div>Weighted avg</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.80</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.79</div>
+                    </div>
+                    <div class="text-center">
+                        <div>0.78</div>
+                    </div>
+                    <div class="text-center">
+                        <div>230</div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 {% endblock sidebar2 %}
