@@ -1,3 +1,4 @@
+{% comment %} 
 {% extends 'app_base.html' %}
 {% load static %}
 
@@ -5,4 +6,78 @@
 {% block 'ml_num' %}Machine Learning 2{% endblock %}
 {% block 'model' %}K-means{% endblock %}
 {% block 'model_title' %}K-means{% endblock %}
-{% block 'algorithm_type' %}Clustering Algorithm{% endblock %}
+{% block 'algorithm_type' %}Clustering Algorithm{% endblock %} 
+
+{% endcomment %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Clustering</title>
+    </head>
+    <body>
+       <h1>K-Means Django Application</h1>
+       <hr>
+
+        <!--<img src="{% static '/img/elbow_plot.png' %}" alt="My image">-->
+
+        <!-- for user input of dataset & n_cluster -->
+        <form method="post" enctype="multipart/form-data">
+            <p>Note: Make sure that the dataset inserted have columns 'title' and 'content'</p>
+            <!--to protect the form for cross-site request forgery (CSRF) attacks.-->
+            {% csrf_token %}
+            <!--to render the form as paragraph format-->
+            {{ form.as_p }}
+
+            <p>Upload Dataset</p>
+            <input type="file" name="csv_file" accept=".csv" required>
+            <input type="text" name="input_k" required placeholder="Enter number of K">
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- display of dataset information -->
+        {% if dataset_info %}
+            <h2>Dataset Details</h2>
+            <ul>
+                <li><strong>Dataset Name:</strong> {{ dataset_info.dataset_name}}</li> 
+                <li><strong>Row Count:</strong> {{ dataset_info.row_count }}</li>
+                <li><strong>Column Names:</strong> {{ dataset_info.column_names|join:', ' }}</li>
+            </ul>
+        {% endif %}
+
+        <!-- to display the bar chart -->
+        {% if chart_image %}
+            <h2>KMeans Cluster Points</h2>
+            <img src="data:image/png;base64,{{ chart_image }}" alt="KMeans cluster points">
+        {% endif %}
+
+        <!-- display word cloud images for each cluster -->
+        {% if wordcloud_images %}
+            <h2>Cluster Word Clouds</h2>
+            {% for title, wordcloud_image in wordcloud_images %}
+                <div>
+                    <h3>{{ title }}</h3>
+                    <img src="data:image/png;base64,{{ wordcloud_image }}" alt="Cluster Word Cloud">
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- for cluster feature words result -->
+        {% if cluster_info %}
+            <h2>Cluster Words</h2>
+            {% for cluster_label, cluster in cluster_info %}
+                <h3>{{ cluster_label }}</h3>
+                <ul>
+                    {% for word in cluster %}
+                        {{ word }}
+                        <!--<li>{{ word }}</li>-->
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        {% endif %}
+    </body>
+</html>
+

@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from app.models import ListOfCrimes
 
 
 # Create your views here.
@@ -36,7 +37,13 @@ class SignupView(View):
         
 class LoginView(View):
     def get(self, request):
-        return render(request, 'authentication/login.html')
+        list_of_crimes = ListOfCrimes.objects.all()
+        if request.user.is_authenticated:
+            return render(request, 'app/classification.html', context={'data':list_of_crimes})
+        elif not request.user.is_authenticated and not request.path_info.startswith('/login'):
+            return redirect('login')
+        else:
+            return render(request, 'authentication/login.html', context={'data':list_of_crimes})
     
     def post(self, request):
         username = request.POST["username"]

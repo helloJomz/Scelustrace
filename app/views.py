@@ -13,11 +13,11 @@ from sklearn.cluster import KMeans
 import io
 import matplotlib.pyplot as plt
 import base64
+from wordcloud import WordCloud
 
 class ClassificationView(LoginRequiredMixin, View):
     def get(self, request):
         list_of_crimes = ListOfCrimes.objects.all()
-        
         return render(request, 'app/classification.html', context={'data':list_of_crimes})
 
     def post(self, request):
@@ -107,7 +107,7 @@ class ClusteringView(LoginRequiredMixin, View):
             dataset_info['row_count'] = len(data)
             dataset_info['column_names'] = data.columns.tolist()
 
-        return render(request, 'kmeans.html', {'cluster_info': cluster_info, 'dataset_info': dataset_info, 'chart_image': chart_image, 'wordcloud_images': wordcloud_images})
+        return render(request, 'app/clustering.html', {'cluster_info': cluster_info, 'dataset_info': dataset_info, 'chart_image': chart_image, 'wordcloud_images': wordcloud_images})
 
 
 
