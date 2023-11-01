@@ -14,9 +14,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import io
 import matplotlib.pyplot as plt
+from io import BytesIO
 import base64
 from wordcloud import WordCloud
 import concurrent.futures
+
+import matplotlib
+matplotlib.use('Agg')
 
 class ClassificationView(LoginRequiredMixin, View):
     def get(self, request):
@@ -61,14 +65,26 @@ def generate_wordcloud(cluster_words, cluster_number):
     image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
     return f'Cluster {cluster_number}', image_base64
 
+
+def create_bar_chart(chart_data):
+    plt.bar(chart_data.index, chart_data.values, alpha=0.4)
+    plt.title('KMeans cluster points')
+    plt.xlabel("Cluster number")
+    plt.ylabel("Number of points")
+
+    chart_buffer = BytesIO()
+    plt.savefig(chart_buffer, format="png")
+    plt.close()
+
+    chart_image = base64.b64encode(chart_buffer.getvalue()).decode('utf-8')
+    return chart_image
+
 @login_required
 def process_fileupload(request):
-    # Check if the context data is cached
-    cached_context = cache.get('context_data')
-    if cached_context:
-        request.session['cache_status'] = True
-        return redirect('clustering')
+    # Delete the first cache
+    cache.delete('context_data')
 
+    # Rest of your code...
     cluster_info = []  # List to store the cluster words
     chart_image = None
     wordcloud_images = []  # List to store Word Cloud images
@@ -115,18 +131,8 @@ def process_fileupload(request):
         wordcloud_images = [future.result() for future in wordcloud_futures]
 
         # Create and save the bar chart of cluster points
-        plt.bar([x for x in range(k)], data.groupby(['cluster'])['content'].count(), alpha=0.4)
-        plt.title('KMeans cluster points')
-        plt.xlabel("Cluster number")
-        plt.ylabel("Number of points")
-
-        # Save the chart as a bytes-like object
-        chart_buffer = io.BytesIO()
-        plt.savefig(chart_buffer, format="png")
-        plt.close()
-
-        # Convert the chart to base64 and encode it as a string
-        chart_image = base64.b64encode(chart_buffer.getvalue()).decode('utf-8')
+        chart_data = data.groupby(['cluster'])['content'].count()
+        chart_image = create_bar_chart(chart_data)
 
         context = {
             'cluster_info': cluster_info,
@@ -142,7 +148,6 @@ def process_fileupload(request):
         request.session['cache_status'] = True
 
     return redirect('clustering')
-    
 
 class ClusteringView(LoginRequiredMixin, View):
     def get(self, request):
@@ -177,7 +182,7 @@ class ClusteringView(LoginRequiredMixin, View):
 def logout_and_clear_sessions(request):
     auth.logout(request)  # Logout the user
     request.session.flush()  # Clear all sessions
-    cache.delete('context_data')
+    cache.clear()
     return redirect('/login')
 
 
