@@ -16,6 +16,7 @@ import io
 import matplotlib.pyplot as plt
 import base64
 from wordcloud import WordCloud
+import concurrent.futures
 
 class ClassificationView(LoginRequiredMixin, View):
     def get(self, request):
@@ -47,18 +48,18 @@ class ClassificationView(LoginRequiredMixin, View):
                 }
         return JsonResponse(result)
     
-############################################################################################
-
-# Set Matplotlib backend to Agg
-import matplotlib
-matplotlib.use('Agg')
-
 @login_required
 def load_fileupload(request):
     return render(request, 'app/fileform.html')
 
 @login_required
 def process_fileupload(request):
+    # Check if the context data is cached
+    cached_context = cache.get('context_data')
+    if cached_context:
+        request.session['cache_status'] = True
+        return redirect('clustering')
+
     cluster_info = []  # List to store the cluster words
     chart_image = None
     wordcloud_images = []  # List to store Word Cloud images
@@ -79,55 +80,58 @@ def process_fileupload(request):
     wordcloud_images = []
 
     if k > 0:
-        model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
-        model.fit(X)
+        # Check if the clustering model is cached
+        cached_model = cache.get('kmeans_model')
+        if not cached_model:
+            model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
+            model.fit(X)
+            # Cache the clustering model
+            cache.set('kmeans_model', model, None)
+        else:
+            model = cached_model
 
         data['cluster'] = model.labels_
 
-        #loop for cluster result w/ 30 feature words
+        # Loop for cluster result w/ 30 feature words
         for i in range(k):
             order_centroids = model.cluster_centers_.argsort()[:, ::-1]
             terms = vectorizer.get_feature_names_out()
             cluster_words = [terms[j] for j in order_centroids[i, :30]]
             cluster_info.append((f'Cluster {i}', cluster_words))
 
-            # wordcloud result
-            wordcloud = WordCloud(width=400, height=400, background_color='white')
-            wordcloud.generate_from_text(' '.join(cluster_words))
+        # Word cloud generation (parallel processing)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            wordcloud_futures = [executor.submit(generate_wordcloud, cluster_info[i][1], i) for i in range(k)]
 
-            # save the word cloud as a base64-encoded image
-            image_data = io.BytesIO()
-            wordcloud.to_image().save(image_data, format="PNG")
-            image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
-            wordcloud_images.append((f'Cluster {i}', image_base64))
+        wordcloud_images = [future.result() for future in wordcloud_futures]
 
-        # create and save the bar chart of cluster points
+        # Create and save the bar chart of cluster points
         plt.bar([x for x in range(k)], data.groupby(['cluster'])['content'].count(), alpha=0.4)
         plt.title('KMeans cluster points')
         plt.xlabel("Cluster number")
         plt.ylabel("Number of points")
 
-        # save the chart as a bytes-like object
+        # Save the chart as a bytes-like object
         chart_buffer = io.BytesIO()
         plt.savefig(chart_buffer, format="png")
         plt.close()
 
-        # convert the chart to base64 and encode it as a string
+        # Convert the chart to base64 and encode it as a string
         chart_image = base64.b64encode(chart_buffer.getvalue()).decode('utf-8')
 
         context = {
-            'cluster_info': cluster_info, 
-            'chart_image': chart_image, 
+            'cluster_info': cluster_info,
+            'chart_image': chart_image,
             'wordcloud_images': wordcloud_images,
             'dataset_name': csv_file.name,
-            'col_count': data.shape[1]-1,
+            'col_count': data.shape[1] - 1,
             'row_count': data.shape[0],
         }
 
-        cache.delete('context_data')
-        cache.set('context_data', context, None) # cache 
+        # Cache the context data
+        cache.set('context_data', context, None)
         request.session['cache_status'] = True
-           
+
     return redirect('clustering')
     
 
