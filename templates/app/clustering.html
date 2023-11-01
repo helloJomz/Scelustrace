@@ -1,4 +1,3 @@
-{% comment %} 
 {% extends 'app_base.html' %}
 {% load static %}
 
@@ -8,76 +7,91 @@
 {% block 'model_title' %}K-means{% endblock %}
 {% block 'algorithm_type' %}Clustering Algorithm{% endblock %} 
 
-{% endcomment %}
 
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Clustering</title>
-    </head>
-    <body>
-       <h1>K-Means Django Application</h1>
-       <hr>
+{% block cl_sidebar1 %}
+    <div class="mt-7 mb-3 border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem] space-y-1">
+        <div class="flex justify-between items-center">
+            <div class="font-space font-bold flex space-x-3 items-center">
+                <img src="{% static 'img/black_ml.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                <p class="m-0 text-base">Model:</p>
+            </div>
+            
+            <div class="font-inter text-xs">
+                <span>K-means</span>
+            </div>
+        </div>
 
-        <!--<img src="{% static '/img/elbow_plot.png' %}" alt="My image">-->
+        <div class="flex justify-between items-center">
+            <div class="font-space font-bold flex space-x-3 items-center">
+                <img src="{% static 'img/dataset_logo.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                <p class="m-0 text-base">Dataset:</p>
+            </div>
+            
+            <div class="font-inter text-xs">
+                <span>{{dataset_name}}</span>
+            </div>
+        </div>
 
-        <!-- for user input of dataset & n_cluster -->
-        <form method="post" enctype="multipart/form-data">
-            <p>Note: Make sure that the dataset inserted have columns 'title' and 'content'</p>
-            <!--to protect the form for cross-site request forgery (CSRF) attacks.-->
-            {% csrf_token %}
-            <!--to render the form as paragraph format-->
-            {{ form.as_p }}
+        <div class="flex justify-between items-center">
+            <div class="font-space font-bold flex space-x-3 items-center">
+                <img src="{% static 'img/dataset_count.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                <p class="m-0 text-base">Column Count:</p>
+            </div>
+            
+            <div class="font-inter text-xs">
+                <span>{{col_count}}</span>
+            </div>
+        </div>
 
-            <p>Upload Dataset</p>
-            <input type="file" name="csv_file" accept=".csv" required>
-            <input type="text" name="input_k" required placeholder="Enter number of K">
-            <button type="submit">Submit</button>
-        </form>
+        <div class="flex justify-between items-center">
+            <div class="font-space font-bold flex space-x-3 items-center">
+                <img src="{% static 'img/dataset_count.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                <p class="m-0 text-base">Row Count:</p>
+            </div>
+            
+            <div class="font-inter text-xs">
+                <span>{{row_count}}</span>
+            </div>
+        </div>
 
-        <!-- display of dataset information -->
-        {% if dataset_info %}
-            <h2>Dataset Details</h2>
-            <ul>
-                <li><strong>Dataset Name:</strong> {{ dataset_info.dataset_name}}</li> 
-                <li><strong>Row Count:</strong> {{ dataset_info.row_count }}</li>
-                <li><strong>Column Names:</strong> {{ dataset_info.column_names|join:', ' }}</li>
-            </ul>
-        {% endif %}
+    </div>
 
-        <!-- to display the bar chart -->
-        {% if chart_image %}
-            <h2>KMeans Cluster Points</h2>
-            <img src="data:image/png;base64,{{ chart_image }}" alt="KMeans cluster points">
-        {% endif %}
+    <div class="flex justify-center">
+        <img src="data:image/png;base64,{{ chart_image }}" alt="KMeans cluster points" class="w-[28rem] h-[20rem]">
+    </div>
+{% endblock cl_sidebar1 %}
 
-        <!-- display word cloud images for each cluster -->
-        {% if wordcloud_images %}
-            <h2>Cluster Word Clouds</h2>
-            {% for title, wordcloud_image in wordcloud_images %}
-                <div>
-                    <h3>{{ title }}</h3>
-                    <img src="data:image/png;base64,{{ wordcloud_image }}" alt="Cluster Word Cloud">
-                </div>
-            {% endfor %}
-        {% endif %}
 
-        <!-- for cluster feature words result -->
-        {% if cluster_info %}
-            <h2>Cluster Words</h2>
-            {% for cluster_label, cluster in cluster_info %}
-                <h3>{{ cluster_label }}</h3>
-                <ul>
+
+
+
+
+{% block cl_main %}
+
+    <div class="h-[45rem] overflow-y-auto grid grid-cols-2 gap-4 pr-3">
+        {% for cluster_label, cluster in cluster_info %}
+            <div class="p-3 rounded-lg border border-1 border-slate-200 text-black">
+                <h3 class="font-space font-bold border-light py-1 select-none">{{ cluster_label }}</h3>
+                <ul class="py-2 font-inter">
                     {% for word in cluster %}
                         {{ word }}
-                        <!--<li>{{ word }}</li>-->
                     {% endfor %}
                 </ul>
-            {% endfor %}
-        {% endif %}
-    </body>
-</html>
+            </div>
+        {% endfor %}
+    </div>
+    
 
+{% endblock cl_main %}
+
+
+
+{% block cl_sidebar2 %}
+    <div class="space-y-5 h-full overflow-y-auto pr-3">
+        {% for title, wordcloud_image in wordcloud_images %}
+            <h3 class="bg-slate-200 w-full rounded-lg py-2 px-5 font-space">{{ title }}</h3>
+            <img src="data:image/png;base64,{{ wordcloud_image }}" alt="Cluster Word Cloud" >
+        {% endfor %}
+    </div>
+
+{% endblock cl_sidebar2 %}

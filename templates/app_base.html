@@ -23,26 +23,41 @@
 
 </head>
 
-<body class="h-screen bg-white overflow-none content opacity-0 animate-opacity">
+<body class="min-h-screen max-h-full bg-white overflow-none content opacity-0 animate-opacity">
 
     {% include 'partials/_app-sidebar.html' %}
     {% include 'partials/_app-navbar.html' %}
     
-    <div class="px-[1rem] text-xs flex space-x-2 mb-[1.1875rem] font-inter">
-                
-        <div class="flex space-x-2 text-[#8F8F8F]">
-            <img src="{% static 'img/gray_ml_logo.png' %}" alt="ml" class="w-[1rem] h-[1rem]" >
-            <span>/</span>
+    <div class="px-[1rem] text-xs flex mb-[1.1875rem] font-inter
+        {% if 'clustering' in request.path %}
+            justify-between
+        {%endif%}
+    ">
+        <div class="
+            flex space-x-2
+        ">
+            <div class="flex space-x-2 text-[#8F8F8F]">
+                <img src="{% static 'img/gray_ml_logo.png' %}" alt="ml" class="w-[1rem] h-[1rem]" >
+                <span>/</span>
+            </div>
+    
+            <div class="flex space-x-2 text-[#8F8F8F]">
+                <span>{% block 'ml_num' %}Machine Learning #{% endblock  %}</span>
+                <span>/</span>
+            </div>
+    
+            <div class="flex space-x-2 text-[#800080]">
+                <span class="font-semibold">{% block 'model' %}Model Name{% endblock  %}</span>
+            </div>
         </div>
 
-        <div class="flex space-x-2 text-[#8F8F8F]">
-            <span>{% block 'ml_num' %}Machine Learning #{% endblock  %}</span>
-            <span>/</span>
-        </div>
-
-        <div class="flex space-x-2 text-[#800080]">
-            <span class="font-semibold">{% block 'model' %}Model Name{% endblock  %}</span>
-        </div>
+        {% if 'clustering' in request.path %}
+            <div class="font-inter" onclick="window.location.href = '/app/fileupload';">
+                <span class="bg-gradient-to-l from-fuchsia-700 via-fuchsia-500 to-fuchsia-400 py-1 px-2 text-white rounded-lg cursor-pointer">Go to file upload</span>
+            </div>
+        {%endif%}
+        
+       
     </div>
 
     <div id="container" class="w-full grid grid-cols-1 lg:grid-cols-4 gap-5 lg:gap-0 ">
@@ -59,23 +74,23 @@
                 <span class="font-inter text-[#8F8F8F] text-[0.7rem]">{% block 'algorithm_type' %}Algorithm Type{% endblock  %}</span>
             </div>
 
-            {% block main %}{% endblock main %}
-
+            {% block cf_main %}{% endblock cf_main %}
+            {% block cl_main %}{% endblock cl_main %}
         </main>
 
         <div id="sidebar-1" class="
             col-span-1
             px-[1rem]
-            hidden
-            lg:block lg:order-first
+            hidden lg:block lg:order-first
             "
         >
+            <div class="h-full">
+                {% include 'partials/_app-sidebar-haft.html' %}
 
-            {% include 'partials/_app-sidebar-haft.html' %}
-
-            {% block cf_sidebar1 %}{% endblock cf_sidebar1 %}
-            {% block cl_sidebar1 %}{% endblock cl_sidebar1 %}
-
+                {% block cf_sidebar1 %}{% endblock cf_sidebar1 %}
+                {% block cl_sidebar1 %}{% endblock cl_sidebar1 %}
+            </div>
+            
         </div>
 
         
@@ -84,12 +99,19 @@
             col-span-1
             px-[1rem]
             order-last
-            mb-5 lg:mb-0
+            {% comment %} mb-5 lg:mb-0 {% endcomment %}
+            
             "
         >
-
-            {% block sidebar2 %}{% endblock sidebar2 %}
-
+            <div class="
+                {% if 'clustering' in request.path %}
+                    h-[50rem]
+                {% endif %}
+            ">
+                {% block sidebar2 %}{% endblock sidebar2 %}
+                {% block cl_sidebar2 %}{% endblock cl_sidebar2 %}
+            </div>
+           
         </div>
 
     </div>
@@ -97,4 +119,6 @@
 </body>
 
 </html>
+
+
 

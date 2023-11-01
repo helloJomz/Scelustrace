@@ -41,7 +41,7 @@
 {% endblock cf_sidebar1 %}
 
 
-{% block main %}
+{% block cf_main %}
 
     <div>
         <div class="relative">
@@ -69,7 +69,7 @@
                             </button>
                         </div>
 
-                        <button id="predict-btn" class="font-space bg-[#D600D6] text-white rounded-lg py-[0.7rem] px-[1rem]
+                        <button id="predict-btn" class="font-space bg-gradient-to-l from-fuchsia-700 via-fuchsia-500 to-fuchsia-400 text-white rounded-lg py-[0.7rem] px-[1rem]
                         select-none cursor-pointer flex space-x-2 justify-center hover:bg-[#ff5cff] focus:outline-none">
 
                             <img src="{% static 'img/search-alt-svgrepo-com.png' %}" alt="predict" class="w-[1.3rem] h-[1.3rem]">
@@ -133,7 +133,7 @@
     </div>
         
     <script src="{% static 'js/classification.js' %}"></script>
-{% endblock main %}
+{% endblock cf_main %}
 
 
 

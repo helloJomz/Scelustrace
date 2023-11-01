@@ -1,0 +1,117 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scelustrace | File Upload</title>
+
+    <!-- DEPENDENCIES -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'img/black_secondary_logo.png' %}" sizes="32x32">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    
+
+</head>
+
+<body class="h-screen bg-white overflow-none content opacity-0 animate-opacity">
+
+    {% include 'partials/_app-sidebar.html' %}
+    {% include 'partials/_app-navbar.html' %}
+    
+    <div class="px-[1rem] text-xs flex space-x-2 mb-[1.1875rem] font-inter">
+                
+        <div class="flex space-x-2 text-[#8F8F8F]">
+            <img src="{% static 'img/gray_ml_logo.png' %}" alt="ml" class="w-[1rem] h-[1rem]" >
+            <span>/</span>
+        </div>
+
+        <div class="flex space-x-2 text-[#8F8F8F]">
+            <span>{% block 'ml_num' %}Machine Learning 2{% endblock  %}</span>
+            <span>/</span>
+        </div>
+
+        <div class="flex space-x-2 text-[#800080]">
+            <span class="font-semibold">K-means</span>
+        </div>
+    </div>
+
+    <div id="container" class="w-full px-1">
+        <div class=" w-full lg:mx-auto ">
+            <div class="relative flex items-center justify-center mt-10 px-6 lg:p-8  relative items-center">
+                <div class="absolute bg-neutral-100 rounded-lg inset-0"></div>
+                <div class="sm:max-w-lg w-full p-10 bg-white rounded-xl z-10">
+                    <div class="text-center">
+                        <h2 class="mt-5 text-3xl font-bold text-gray-900">
+                            Upload your Dataset!
+                        </h2>
+                        <p class="mt-2 text-sm text-gray-400">K-means clustering algorithm.</p>
+                    </div>
+                    <form class="mt-8 space-y-3" action="{% url 'process_fileupload' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 space-y-2">
+                            <label class="text-sm font-bold text-gray-500 tracking-wide">Number of K:</label>
+                            <input name="input_k" class="text-base p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="Most recommended Odd Numbers">
+                        </div>
+                        <div class="grid grid-cols-1 space-y-2">
+                            <label class="text-sm font-bold text-gray-500 tracking-wide">Attach Document</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label class="flex flex-col rounded-lg border-4 border-dashed w-full h-60 p-10 group text-center">
+                                    <div class="h-full w-full text-center flex flex-col items-center justify-center items-center  ">
+                                        <div class="flex flex-auto max-h-48 w-2/5 mx-auto -mt-10">
+                                            <img class="has-mask h-36 object-center" src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg" alt="freepik image">
+                                        </div>
+                                        <p id="placeholder_only" class="pointer-none text-gray-500 ">
+                                            <span class="text-sm">Drag and drop</span> files here <br /> or
+                                            <label for="csv_file" class="text-blue-600 hover:underline">select a file</label> from your computer
+                                        </p>
+                                        
+                                        <div id="selected-container" class="hidden">
+                                            <span class="text-gray-500 text-xs font-inter">selected dataset</span>
+                                            <p id="selected-file-info" class="font-space font-bold text-base "></p>
+                                        </div>
+                                    </div>
+                                    <input name="csv_file" type="file" id="csv_file" class="hidden" accept=".csv" required>
+                                </label>
+                            </div>
+                        </div>
+                        <p class="text-sm text-black">
+                            <span >File type accepted: csv</span>
+                        </p>
+                        <div>
+                            <button type="submit" class="my-5 w-full flex justify-center bg-gradient-to-l from-fuchsia-700 via-fuchsia-500 to-fuchsia-400 text-gray-100 p-4 rounded-lg tracking-wide
+                                            font-semibold  focus:outline-none focus:shadow-outline hover:bg-blue-600 shadow-lg cursor-pointer transition ease-in duration-300">
+                                Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            const fileInput = $('#csv_file');
+            const fileInfo = $('#selected-file-info');
+    
+            fileInput.on('change', function() {
+                const selectedFileName = $(this).prop('files')[0].name;
+                $("#placeholder_only").hide()
+                $("#selected-container").show()
+                fileInfo.text(`${selectedFileName}`);
+            });
+        });
+    </script>
+</body>
+
+</html>
+
