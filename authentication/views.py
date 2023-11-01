@@ -38,12 +38,14 @@ class SignupView(View):
 class LoginView(View):
     def get(self, request):
         list_of_crimes = ListOfCrimes.objects.all()
+        context = {'data': list_of_crimes}
+        
         if request.user.is_authenticated:
-            return render(request, 'app/classification.html', context={'data':list_of_crimes})
+            return render(request, 'app/classification.html', context)
         elif not request.user.is_authenticated and not request.path_info.startswith('/login'):
             return redirect('login')
         else:
-            return render(request, 'authentication/login.html', context={'data':list_of_crimes})
+            return render(request, 'authentication/login.html', context)
     
     def post(self, request):
         username = request.POST["username"]
