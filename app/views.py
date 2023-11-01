@@ -52,6 +52,15 @@ class ClassificationView(LoginRequiredMixin, View):
 def load_fileupload(request):
     return render(request, 'app/fileform.html')
 
+
+def generate_wordcloud(cluster_words, cluster_number):
+    wordcloud = WordCloud(width=400, height=400, background_color='white')
+    wordcloud.generate_from_text(' '.join(cluster_words))
+    image_data = io.BytesIO()
+    wordcloud.to_image().save(image_data, format="PNG")
+    image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
+    return f'Cluster {cluster_number}', image_base64
+
 @login_required
 def process_fileupload(request):
     # Check if the context data is cached
