@@ -51,13 +51,8 @@
             </div>
         </div>
 
-        {% if 'clustering' in request.path %}
-            <div class="font-inter" onclick="window.location.href = '/app/fileupload';">
-                <span class="bg-gradient-to-l from-fuchsia-700 via-fuchsia-500 to-fuchsia-400 py-1 px-2 text-white rounded-lg cursor-pointer">Go to file upload</span>
-            </div>
-        {%endif%}
         
-       
+    
     </div>
 
     <div id="container" class="w-full grid grid-cols-1 lg:grid-cols-4 gap-5 lg:gap-0 ">
@@ -68,12 +63,20 @@
             px-[1rem]
             "
         >
+            <div class="flex justify-between items-center">
 
-            <div class="font-space flex flex-col mb-[2rem]">
-                <h3 class="font-bold text-[#800080] text-2xl">{% block 'model_title' %}Model Name{% endblock  %}</h3>
-                <span class="font-inter text-[#8F8F8F] text-[0.7rem]">{% block 'algorithm_type' %}Algorithm Type{% endblock  %}</span>
+                <div class="font-space flex flex-col mb-[2rem]">
+                    <h3 class="font-bold text-[#800080] text-2xl">{% block 'model_title' %}Model Name{% endblock  %}</h3>
+                    <span class="font-inter text-[#8F8F8F] text-[0.7rem]">{% block 'algorithm_type' %}Algorithm Type{% endblock  %}</span>
+                </div>
+
+                {% if 'clustering' in request.path %}
+                    <div class="font-inter" onclick="window.location.href = '/app/fileupload';">
+                        <span class="bg-gradient-to-l from-fuchsia-700 via-fuchsia-500 to-fuchsia-400 py-1 px-2 text-white rounded-lg cursor-pointer">Go to file upload</span>
+                    </div>
+                {%endif%}
             </div>
-
+            
             {% block cf_main %}{% endblock cf_main %}
             {% block cl_main %}{% endblock cl_main %}
         </main>

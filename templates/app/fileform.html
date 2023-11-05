@@ -50,8 +50,24 @@
             <div class="relative flex items-center justify-center mt-10 px-6 lg:p-8  relative items-center">
                 <div class="absolute bg-neutral-100 rounded-lg inset-0"></div>
                 <div class="sm:max-w-lg w-full p-10 bg-white rounded-xl z-10">
+                    
+                    <div class="w-full close-sidebar cursor-pointer text-sm" 
+                        onclick="window.location.href = '/app/classification' ">
+                        <div class="flex space-x-3 items-center">
+                            <img src="{%static 'img/arrow-back-basic-svgrepo-com.png' %}" alt="close" class="w-[2.25rem] h-[2.25rem]">
+                            <p class="font-space text-base font-bold ">Go back</p>
+                        </div>
+                    
+                    </div>
+
+                    {% if error %}
+                        <div class="my-3 text-red-500 text-sm font-inter flex flex-col bg-red-200 rounded-lg w-full px-[2rem] py-[0.5rem] text-center">
+                            {{error}}
+                        </div>
+                    {% endif %}
+
                     <div class="text-center">
-                        <h2 class="mt-5 text-3xl font-bold text-gray-900">
+                        <h2 class="mt-5 text-2xl font-bold text-gray-900">
                             Upload your Dataset!
                         </h2>
                         <p class="mt-2 text-sm text-gray-400">K-means clustering algorithm.</p>
@@ -102,13 +118,14 @@
         $(document).ready(function() {
             const fileInput = $('#csv_file');
             const fileInfo = $('#selected-file-info');
-    
+   
             fileInput.on('change', function() {
                 const selectedFileName = $(this).prop('files')[0].name;
-                $("#placeholder_only").hide()
-                $("#selected-container").show()
-                fileInfo.text(`${selectedFileName}`);
+                $("#placeholder_only").hide();
+                $("#selected-container").show();
+                fileInfo.text(selectedFileName);
             });
+            
         });
     </script>
 </body>

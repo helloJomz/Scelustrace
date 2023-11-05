@@ -83,75 +83,85 @@ def create_bar_chart(chart_data):
 def process_fileupload(request):
     # Delete the first cache
     cache.delete('context_data')
-
-    # Rest of your code...
-    cluster_info = []  # List to store the cluster words
-    chart_image = None
-    wordcloud_images = []  # List to store Word Cloud images
-
-    csv_file = request.FILES['csv_file']
-    data = pd.read_csv(csv_file)
-    content_data = data['content']
-    vectorizer = TfidfVectorizer(stop_words='english')
-    X = vectorizer.fit_transform(content_data)
-
     input_k = request.POST.get('input_k', '')
-    k = 0  # Default value
 
-    if input_k and input_k.isdigit():
-        k = int(input_k)
+    if input_k:
+        if input_k.isdigit():
+            if int(input_k) <= 13:
+                cluster_info = []  # List to store the cluster words
+                chart_image = None
+                wordcloud_images = []  # List to store Word Cloud images
 
-    chart_image = None
-    wordcloud_images = []
+                csv_file = request.FILES['csv_file']
+                data = pd.read_csv(csv_file)
+                content_data = data['content']
+                vectorizer = TfidfVectorizer(stop_words='english')
+                X = vectorizer.fit_transform(content_data)
 
-    if k > 0:
-        # Check if the clustering model is cached
-        cached_model = cache.get('kmeans_model')
-        if not cached_model:
-            model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
-            model.fit(X)
-            # Cache the clustering model
-            cache.set('kmeans_model', model, None)
+
+                k = 0  # Default value
+
+                if input_k and input_k.isdigit():
+                    k = int(input_k)
+
+                chart_image = None
+                wordcloud_images = []
+
+                if k > 0:
+                    # Check if the clustering model is cached
+                    cached_model = cache.get('kmeans_model')
+                    if not cached_model:
+                        model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
+                        model.fit(X)
+                        # Cache the clustering model
+                        cache.set('kmeans_model', model, None)
+                    else:
+                        model = cached_model
+
+                    data['cluster'] = model.labels_
+
+                    # Loop for cluster result w/ 30 feature words
+                    for i in range(k):
+                        order_centroids = model.cluster_centers_.argsort()[:, ::-1]
+                        terms = vectorizer.get_feature_names_out()
+                        cluster_words = [terms[j] for j in order_centroids[i, :30]]
+                        cluster_info.append((f'Cluster {i}', cluster_words))
+
+                    # Word cloud generation (parallel processing)
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        wordcloud_futures = [executor.submit(generate_wordcloud, cluster_info[i][1], i) for i in range(k)]
+
+                    wordcloud_images = [future.result() for future in wordcloud_futures]
+
+                    # Create and save the bar chart of cluster points
+                    chart_data = data.groupby(['cluster'])['content'].count()
+                    chart_image = create_bar_chart(chart_data)
+
+                    context = {
+                        'cluster_info': cluster_info,
+                        'chart_image': chart_image,
+                        'wordcloud_images': wordcloud_images,
+                        'dataset_name': csv_file.name,
+                        'col_count': data.shape[1] - 1,
+                        'row_count': data.shape[0],
+                    }
+
+                    # Cache the context data
+                    cache.set('context_data', context, None)
+
+                    return redirect('clustering')
+            else:
+                return render(request, 'app/fileform.html', {'error': 'The Number of K should not exceed 13!'})
         else:
-            model = cached_model
+            return render(request, 'app/fileform.html', {'error': 'The Number of K should be numbers only!'})
+    else:
+        return render(request, 'app/fileform.html', {'error': 'The Number of K should not be empty!'})
 
-        data['cluster'] = model.labels_
-
-        # Loop for cluster result w/ 30 feature words
-        for i in range(k):
-            order_centroids = model.cluster_centers_.argsort()[:, ::-1]
-            terms = vectorizer.get_feature_names_out()
-            cluster_words = [terms[j] for j in order_centroids[i, :30]]
-            cluster_info.append((f'Cluster {i}', cluster_words))
-
-        # Word cloud generation (parallel processing)
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            wordcloud_futures = [executor.submit(generate_wordcloud, cluster_info[i][1], i) for i in range(k)]
-
-        wordcloud_images = [future.result() for future in wordcloud_futures]
-
-        # Create and save the bar chart of cluster points
-        chart_data = data.groupby(['cluster'])['content'].count()
-        chart_image = create_bar_chart(chart_data)
-
-        context = {
-            'cluster_info': cluster_info,
-            'chart_image': chart_image,
-            'wordcloud_images': wordcloud_images,
-            'dataset_name': csv_file.name,
-            'col_count': data.shape[1] - 1,
-            'row_count': data.shape[0],
-        }
-
-        # Cache the context data
-        cache.set('context_data', context, None)
-        request.session['cache_status'] = True
-
-    return redirect('clustering')
+    
 
 class ClusteringView(LoginRequiredMixin, View):
     def get(self, request):
-        context = cache.get('context_data', {})
+        context = cache.get('context_data')
         return render(request, 'app/clustering.html', context)
 
         

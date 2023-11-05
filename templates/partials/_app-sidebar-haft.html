@@ -5,13 +5,15 @@
     <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer
         {% if 'classification' in request.path %}
             bg-[#fae6fc]
+        {% elif 'app' in request.path %}
+            bg-[#F4F4F4]
+            hover:bg-[#d9dbdb]
         {% else %}
             bg-[#F4F4F4]
             hover:bg-[#d9dbdb]
         {% endif %}
         " 
         onclick="window.location.href = '/app/classification';">
-
         <img src="{% static 'img/classification_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
         
         <div>
@@ -21,32 +23,31 @@
     </div>
 
     <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
-        {% if 'clustering' in request.path  %}
+        {% if 'clustering' in request.path %}
             bg-[#fae6fc]
         {% else %}
             bg-[#F4F4F4]
             hover:bg-[#d9dbdb]
         {% endif %}
         " 
-        
-        onclick="window.location.href = {% if request.session.cache_status %} '/app/clustering' {% else %} '/app/fileupload' {% endif %};">
+        onclick="window.location.href = {% if cluster_info and chart_image %} '/app/clustering' {% else %} '/app/fileupload' {% endif %};">
         <img src="{% static 'img/clustering_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
         
         <div>
-            <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 2</span>
+            <span class="font-inter text-[#8F8F8F] text-xs">Machine Learning 2 </span>
             <p class="font-space text-base font-bold m-0">Clustering Algorithm</p>
         </div>
     </div>
 
     <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
-        {% if 'analytics' in request.path  %}
+        {% if 'analytics' in request.path %}
             bg-[#fae6fc]
         {% else %}
             bg-[#F4F4F4]
-            hover:bg-[#d9dbdb]
+            hover.bg-[#d9dbdb]
         {% endif %}
-        " 
-    
+        "
+        
         onclick="window.location.href = '/app/analytics';">
         <img src="{% static 'img/analytics_logo.png' %}" alt="" class="w-[3.1875rem] h-[3.1875rem]">
         

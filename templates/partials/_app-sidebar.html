@@ -66,12 +66,15 @@
                 {% endif %}
 
                 <div class="w-full h-[30%] rounded-lg p-[1rem] flex space-x-3
-                    {% if 'classification' in request.path or 'app/' in request.path  %}
-                        bg-[#fae6fc]
-                    {% else %}
-                        bg-[#F4F4F4]
-                        hover:bg-[#d9dbdb]
-                    {% endif %}
+                {% if 'classification' in request.path %}
+                    bg-[#fae6fc]
+                {% elif 'app' in request.path %}
+                    bg-[#F4F4F4]
+                    hover:bg-[#d9dbdb]
+                {% else %}
+                    bg-[#F4F4F4]
+                    hover:bg-[#d9dbdb]
+                {% endif %}
                 " 
                 onclick="window.location.href = '/app/';"
                 >
