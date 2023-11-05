@@ -2,7 +2,7 @@
 
 <div class="grid grid-cols-1 gap-5">
         
-    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer
+    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer select-none
         {% if 'classification' in request.path %}
             bg-[#fae6fc]
         {% elif 'app' in request.path %}
@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
+    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer select-none 
         {% if 'clustering' in request.path %}
             bg-[#fae6fc]
         {% else %}
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer 
+    <div class="w-full rounded-lg p-[1rem] flex space-x-3 cursor-pointer select-none 
         {% if 'analytics' in request.path %}
             bg-[#fae6fc]
         {% else %}
