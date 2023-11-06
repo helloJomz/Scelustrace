@@ -1,4 +1,4 @@
-from .views import ClassificationView, ClusteringView
+from .views import ClassificationView, ClusteringView, AnalyticsView
 from django.urls import path
 from . import views
 
@@ -13,6 +13,8 @@ urlpatterns = [
     path('process_fileupload/', views.process_fileupload, name="process_fileupload"),
     path('clustering/', ClusteringView.as_view(), name="clustering"),
 
-    path('signout/', views.logout_and_clear_sessions, name="signout")
+    path('analytics/', AnalyticsView.as_view(), name="analytics"),
+
+    path('signout/', views.logout_and_clear_sessions, name="signout"),
     
 ]

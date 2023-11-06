@@ -1,0 +1,218 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scelustrace | Analytics</title>
+
+    <!-- DEPENDENCIES -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'img/black_secondary_logo.png' %}" sizes="32x32">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+</head>
+
+<body class="h-full w-full bg-white content opacity-0 animate-opacity">
+    
+    <div class="fixed w-fit top-0 mt-5 ms-[7rem] z-[1000]">
+
+        <div class="flex space-x-3 items-center bg-white pl-[1rem] pr-[0.4rem] py-[0.3rem] rounded-[3rem] select-none hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
+            <div>
+                <p class="font-inter text-xs lg:text-base font-semibold m-0 ">{{ request.session.user_fullname | title }}</p>
+            </div>
+            <div>
+                <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[1.2rem] h-[1.2rem] lg:w-[2rem] lg:h-[2rem] object-cover ">
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class="flex">
+
+        <div id="mobile-sidebar" class="fixed hidden h-full lg:block lg:fixed top-0 w-[5rem] h-full bg-white z-[1000] shadow-xl ">
+            <div class="py-[2rem] px-[0.5rem] space-y-7 font-inter h-1/2">
+
+                <div class="border-light pb-10 cursor-pointer">
+                    <img src="{%static 'img/black_secondary_logo.png' %}" alt="logo" class="mx-auto">
+                </div>
+
+                <div class="font-inter text-center cursor-pointer pt-3 pb-2 px-1 hover:bg-slate-200 rounded-md"
+                onclick="window.location.href = '/app/classification';">
+                    <img src="{% static 'img/analytics_cf.png' %}" alt="" class="w-[1.5rem] h-[1.5rem] mx-auto">
+                    <span class="text-[0.53rem] mt-3">Classification</span>
+                </div>
+
+                <div class="font-inter text-center cursor-pointer pt-3 pb-2 px-1 hover:bg-slate-200 rounded-md "
+                onclick="window.location.href = '/app/clustering';">
+                    <img src="{% static 'img/analytics_cl.png' %}" alt="" class="w-[2rem] h-[2rem] mx-auto">
+                    <span class="text-[0.53rem] mt-3">Clustering</span>
+                </div>
+
+            </div>
+
+            <div class="h-1/2 px-[0.5rem] font-inter relative">
+                <div class="absolute bottom-0 ">
+                    <form action=" {% url 'signout' %} " method="POST">
+                        {% csrf_token %}
+    
+                        <button  class="mb-7 pl-3 pt-3 pb-3 pr-4 hover:bg-slate-200 rounded-md text-center">
+                            <img src="{%static 'img/logout-3-svgrepo-com.png' %}" alt="close" class="w-[2rem] h-[2rem] mx-auto">
+                            <span class="text-[0.53rem] mt-3">Signout</span>
+                        </button> 
+    
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="h-screen w-full ">
+            {{ map | safe }}
+        </div>
+
+        <div class="fixed bottom-0 left-0 bg-white rounded-xl mb-8 ml-[7rem] z-[1000] text-xs p-2 font-inter cursor-pointer select-none hover:bg-[#d9dbdb]">
+            <div class="w-fit flex space-x-2">
+                <img src="{% static 'img/analytics-graph-chart-svgrepo-com.png' %}" alt="" class="w-[1rem] h-[1rem]">
+                <span>Analytics</span>
+            </div>
+        </div>
+
+
+        <div class="font-inter bg-white fixed bottom-0 left-0 ml-[7rem] z-[1000] bg-white px-1 py-0 bg-opacity-80">
+            <p class="text-[0.6rem] p-0 m-0">© 2023 <span class="text-sky-700">Tracer NU Manila</span>, All rights reserved.</p>
+        </div>
+
+
+        <div class="fixed bottom-0 right-0">
+            <div id="legend-menu" class="shadow-lg bg-white rounded-full w-[3rem] h-[3rem] z-[1000] my-8 mx-5 flex items-center cursor-pointer hover:bg-[#d9dbdb]">
+                <img src="{% static 'img/map-legend-svgrepo-com.png' %}" alt="" class="w-[1.5rem] h-[1.5rem] mx-auto">
+            </div>
+
+            <div id="legend-container" class="hidden relative w-[12rem] h-[16rem] z-[1000] bg-white rounded-lg my-8 mx-5 p-2 font-inter"> 
+
+                <div id="close-legend" class="absolute bg-white rounded-full w-[2rem] h-[2rem] left-[-3rem] top-[-0.03rem] flex items-center shadow-lg cursor-pointer">
+                    <img src="{% static 'img/close-square-svgrepo-com (1).png' %}" alt="" class="w-[1rem] h-[1rem] mx-auto">
+                </div>
+
+                <div class="w-full flex text-center text-xs">
+                    <div class="w-full p-2 bg-slate-200 rounded-sm cursor-pointer select-none legend-button">
+                        <span>HeatMap</span>
+                    </div>
+                    <div class="w-full p-2 cursor-pointer select-none legend-button">
+                        <span>Bubble</span>
+                    </div>
+                </div>
+
+                <div  class="hidden py-3 px-3 content-0 font-inter">
+                    <p class="text-start font-semibold text-xs mb-2">Legend</p>
+                    <div class="flex justify-center font-inter">
+                       
+                        <div class="w-1/3 bg-gradient-to-t from-red-400 via-yellow-400 to-green-400 h-[10rem]"></div>
+
+                        <div class="flex flex-col h-[10rem]">
+                            <p class="h-full text-center text-xs order-1">— Low</p>
+                            <p class="h-full mt-[8rem] text-end text-xs order-2">— High</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden p-3 content-1 text-xs">
+                    <p class="text-start font-semibold">Legend</p>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <div class="w-2 h-2 bg-red-500"></div>
+                        <p class="">Violent Crime</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <div class="w-2 h-2 bg-violet-500"></div>
+                        <p class="">Property Crime</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <div class="w-2 h-2 bg-green-500"></div>
+                        <p class="">Morality Crime</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <div class="w-2 h-2 bg-purple-500"></div>
+                        <p class="">Statutory Crime</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <div class="w-2 h-2 bg-orange-500"></div>
+                        <p>Financial/White Collar Crime</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <div class="w-2 h-2 bg-pink-500"></div>
+                        <p class="">Cybercrime</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            $(document).ready(function() {
+
+                // Click event on the legend menu to show the legend container
+                $("#legend-menu").click(function() {
+                    $(this).hide();
+                    $("#legend-container").show();
+                    $("#close-legend").show();
+                });
+
+                $("#close-legend").click(function() {
+                    $(this).hide();
+                    $("#legend-container").hide();
+                    $("#legend-menu").show();
+                })
+
+                // Show content-0 by default
+                $('.content-0').removeClass('hidden');
+                $('.content-1').addClass('hidden');
+
+                $('.legend-button').click(function() {
+                    var buttonIndex = $('.legend-button').index(this);
+            
+                    // Remove bg-slate-200 from all buttons
+                    $('.legend-button').removeClass('bg-slate-200');
+            
+                    if (buttonIndex === 0) {
+                        // Clicked the HeatMap button
+                        $('.content-0').removeClass('hidden');
+                        $('.content-1').addClass('hidden');
+                        // Add bg-slate-200 to HeatMap button
+                        $(this).addClass('bg-slate-200');
+                    } else if (buttonIndex === 1) {
+                        // Clicked the Bubble button
+                        $('.content-0').addClass('hidden');
+                        $('.content-1').removeClass('hidden');
+                        // Add bg-slate-200 to Bubble button
+                        $(this).addClass('bg-slate-200');
+                    }
+                });
+            });
+        </script>
+
+    </div>
+
+
+</body>
+
+
+</html>
+
+
+
+
+
+
+
+
+

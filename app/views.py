@@ -22,6 +22,10 @@ import concurrent.futures
 import matplotlib
 matplotlib.use('Agg')
 
+import folium
+from folium.plugins import HeatMap, MarkerCluster
+from branca.element import Figure
+
 class ClassificationView(LoginRequiredMixin, View):
     def get(self, request):
         list_of_crimes = ListOfCrimes.objects.all()
@@ -163,6 +167,113 @@ class ClusteringView(LoginRequiredMixin, View):
     def get(self, request):
         context = cache.get('context_data')
         return render(request, 'app/clustering.html', context)
+    
+
+
+
+
+class AnalyticsView(LoginRequiredMixin, View):
+    def get(self, request):
+
+        # Load your data from a CSV file
+        df = pd.read_csv('./static/csv/gmanews.csv')
+
+        # Filter out rows with missing latitude or longitude
+        df = df.dropna(subset=['latitude', 'longitude'])
+        
+        # Create a Folium map
+        mapObj = folium.Map(location=[14.6760, 121.0437], zoom_start=12, max_bounds=True, zoomControl=False)
+
+        fig = Figure(height="100%")
+        fig.add_child(mapObj)
+
+        folium.TileLayer('cartodbdark_matter').add_to(mapObj)
+
+        # Create a GeoJSON layer for Quezon City
+        folium.GeoJson(
+            data='./static/csv/quezoncity_eastern_manila.geojson',
+            name='Q.C. Border',
+            style_function=lambda x: {
+                "color": "brown",
+                "weight": 2,
+                "fill": False,
+            }
+        ).add_to(mapObj)
+
+        circle_fg = folium.FeatureGroup(name="Crime Bubble", show=False).add_to(mapObj)
+
+        # Create a MarkerCluster
+        marker_cluster = MarkerCluster(name='Circle').add_to(circle_fg)
+
+        # Color list for crime_types
+        crime_type_colors = {
+            1: "red",    # Violent Crime
+            2: "violet", # Property Crime
+            3: "green",  # Morality Crime
+            4: "purple", # Statutory Crime
+            5: "orange", # Financial/White Collar Crime
+            6: "pink"    # Cybercrime
+        }
+
+        for itr in range(len(df)):
+            latVal = df.iloc[itr]['latitude']
+            longVal = df.iloc[itr]['longitude']
+            color = crime_type_colors[df.iloc[itr]['crime_numeric']]
+            
+            marker = folium.Circle(
+                location=[latVal, longVal],
+                radius=1000,
+                color=color,
+                weight=2,
+                fill=True,
+                opacity=0.05
+            )
+
+            # Add the marker to the MarkerCluster
+            marker.add_to(marker_cluster)
+
+        # Add the MarkerCluster to your map
+        marker_cluster.add_to(circle_fg)
+
+        circle_legend = """
+        <div id="legend" style="position: fixed; bottom: 50px; left: 50px; width: 150px; background-color: white; border: 2px solid grey; z-index: 9999; font-size: 14px;">
+            <p style="margin: 10px; text-align: center;">Legend</p>
+            <p style="margin: 10px;">Violent Crime <span style="background-color: red; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+            <p style="margin: 10px;">Property Crime <span style="background-color: violet; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+            <p style="margin: 10px;">Morality Crime <span style="background-color: green; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+            <p style="margin: 10px;">Statutory Crime <span style="background-color: purple; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+            <p style="margin: 10px;">Financial/White Collar Crime <span style="background-color: orange; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+            <p style="margin: 10px;">Cybercrime <span style="background-color: pink; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+        </div>
+        """
+
+        # Add the legend to the map
+        mapObj.add_child(folium.Element(circle_legend))
+        circle_fg.add_to(mapObj)
+
+        # Group by latitude and longitude and calculate the total number of crimes
+        heatmap_data = df.groupby(['latitude', 'longitude'])['crime_numeric'].sum().reset_index()
+
+        # Create a heatmap using the total number of crimes
+        heat_data = [[row['latitude'], row['longitude'], row['crime_numeric']] for index, row in heatmap_data.iterrows()]
+
+        # Add the heatmap layer with the 'overlay' parameter set to True
+        heatmap_layer = HeatMap(heat_data, name='Crime Heatmap').add_to(mapObj)
+        heatmap_layer.add_to(mapObj)  
+
+        # Add a Layer Control 
+        folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
+
+        context = {'map': mapObj._repr_html_()}
+
+        return render(request, 'app/analytics.html', context)
+
+
+
+
+
+
+
 
         
            
