@@ -24,7 +24,7 @@
 
 <body class="h-full w-full bg-white content opacity-0 animate-opacity">
     
-    <div class="fixed w-fit top-0 mt-5 ms-[7rem] z-[1000]">
+    <div class="fixed w-fit top-0 mt-5 ms-[4rem] lg:ms-[7rem] z-[1000]">
 
         <div class="flex space-x-3 items-center bg-white pl-[1rem] pr-[0.4rem] py-[0.3rem] rounded-[3rem] select-none hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
             <div>
@@ -40,7 +40,7 @@
 
     <div class="flex">
 
-        <div id="mobile-sidebar" class="fixed hidden h-full lg:block lg:fixed top-0 w-[5rem] h-full bg-white z-[1000] shadow-xl ">
+        <div id="mobile-sidebar" class="fixed h-full fixed top-0 w-[3rem] lg:w-[5rem] h-full bg-white z-[1000] shadow-xl ">
             <div class="py-[2rem] px-[0.5rem] space-y-7 font-inter h-1/2">
 
                 <div class="border-light pb-10 cursor-pointer">
@@ -49,14 +49,14 @@
 
                 <div class="font-inter text-center cursor-pointer pt-3 pb-2 px-1 hover:bg-slate-200 rounded-md"
                 onclick="window.location.href = '/app/classification';">
-                    <img src="{% static 'img/analytics_cf.png' %}" alt="" class="w-[1.5rem] h-[1.5rem] mx-auto">
-                    <span class="text-[0.53rem] mt-3">Classification</span>
+                    <img src="{% static 'img/analytics_cf.png' %}" alt="" class="w-[1rem] h-[1rem] lg:w-[1.5rem] lg:h-[1.5rem] mx-auto">
+                    <span class="hidden lg:block lg:text-[0.53rem] mt-3">Classification</span>
                 </div>
 
                 <div class="font-inter text-center cursor-pointer pt-3 pb-2 px-1 hover:bg-slate-200 rounded-md "
                 onclick="window.location.href = '/app/clustering';">
-                    <img src="{% static 'img/analytics_cl.png' %}" alt="" class="w-[2rem] h-[2rem] mx-auto">
-                    <span class="text-[0.53rem] mt-3">Clustering</span>
+                    <img src="{% static 'img/analytics_cl.png' %}" alt="" class="w-[1.5rem] h-[1.5rem] lg:w-[2rem] lg:h-[2rem] mx-auto">
+                    <span class="hidden lg:block lg:text-[0.53rem] mt-3">Clustering</span>
                 </div>
 
             </div>
@@ -66,9 +66,9 @@
                     <form action=" {% url 'signout' %} " method="POST">
                         {% csrf_token %}
     
-                        <button  class="mb-7 pl-3 pt-3 pb-3 pr-4 hover:bg-slate-200 rounded-md text-center">
-                            <img src="{%static 'img/logout-3-svgrepo-com.png' %}" alt="close" class="w-[2rem] h-[2rem] mx-auto">
-                            <span class="text-[0.53rem] mt-3">Signout</span>
+                        <button  class="mb-7 pl-1 lg:pl-3 lg:pt-3 lg:pb-3 lg:pr-4 hover:bg-slate-200 rounded-md text-center">
+                            <img src="{%static 'img/logout-3-svgrepo-com.png' %}" alt="close" class=" w-[1.5rem] h-[1.5rem] mx-auto">
+                            <span class="hidden lg:block lg:text-[0.53rem] mt-3">Signout</span>
                         </button> 
     
                     </form>
@@ -81,7 +81,7 @@
             {{ map | safe }}
         </div>
 
-        <div class="fixed bottom-0 left-0 bg-white rounded-xl mb-8 ml-[7rem] z-[1000] text-xs p-2 font-inter cursor-pointer select-none hover:bg-[#d9dbdb]">
+        <div class="fixed bottom-0 left-0 bg-white rounded-xl mb-8  ml-[4rem] lg:ml-[7rem] z-[1000] text-xs p-2 font-inter cursor-pointer select-none hover:bg-[#d9dbdb]">
             <div class="w-fit flex space-x-2">
                 <img src="{% static 'img/analytics-graph-chart-svgrepo-com.png' %}" alt="" class="w-[1rem] h-[1rem]">
                 <span>Analytics</span>
@@ -94,8 +94,8 @@
         </div>
 
 
-        <div class="fixed bottom-0 right-0">
-            <div id="legend-menu" class="shadow-lg bg-white rounded-full w-[3rem] h-[3rem] z-[1000] my-8 mx-5 flex items-center cursor-pointer hover:bg-[#d9dbdb]">
+        <div class="fixed bottom-0 right-0 z-[1000]">
+            <div id="legend-menu" class="shadow-lg bg-white rounded-full w-[3rem] h-[3rem] z-[1000] my-8 mx-5 flex select-none items-center cursor-pointer hover:bg-[#d9dbdb]">
                 <img src="{% static 'img/map-legend-svgrepo-com.png' %}" alt="" class="w-[1.5rem] h-[1.5rem] mx-auto">
             </div>
 
