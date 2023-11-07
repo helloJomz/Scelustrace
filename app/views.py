@@ -170,133 +170,178 @@ class ClusteringView(LoginRequiredMixin, View):
     
 
 
-
-
 class AnalyticsView(LoginRequiredMixin, View):
     def get(self, request):
 
-        # Load your data from a CSV fileg
-        df = pd.read_csv('./static/csv/gmanews.csv')
+            # Load your data from a CSV file
+            df = pd.read_csv('./static/csv/gmanews.csv')
 
-        # Filter out rows with missing latitude or longitude
-        df = df.dropna(subset=['latitude', 'longitude'])
+            # Filter out rows with missing latitude or longitude
+            df = df.dropna(subset=['latitude', 'longitude'])
+            
+            # Create a Folium map
+            mapObj = folium.Map(location=[14.6760, 121.0437], zoom_start=12, max_bounds=True, zoomControl=False, tiles='cartodbpositron')
 
-        # Create a Folium map
-        mapObj = folium.Map(location=[14.6760, 121.0437], zoom_start=12, max_bounds=True, zoomControl=False, tiles='cartodbpositron')
+            fig = Figure(height="100%")
+            fig.add_child(mapObj)
 
-        fig = Figure(height="100%")
-        fig.add_child(mapObj)
+            # Add a light mode tile layer
+            folium.TileLayer('cartodbdark_matter').add_to(mapObj)
 
-        # Add a light mode tile layer
-        folium.TileLayer('cartodbdark_matter').add_to(mapObj)
+            # Create a GeoJSON layer for Quezon City
+            folium.GeoJson(
+                data='./static/csv/quezoncity_eastern_manila.geojson',
+                name='Q.C. Border',
+                style_function=lambda x: {
+                    "color": "brown",
+                    "weight": 2,
+                    "fill": False,
+                }
+            ).add_to(mapObj)
 
-        # Create a GeoJSON layer for Quezon City
-        folium.GeoJson(
-            data='./static/csv/quezoncity_eastern_manila.geojson',
-            name='Q.C. Border',
-            style_function=lambda x: {
-                "color": "brown",
-                "weight": 2,
-                "fill": False,
+            circle_fg = folium.FeatureGroup(name="Crime Bubble", show=False).add_to(mapObj)
+            marker_fg = folium.FeatureGroup(name="Crime Marker", show=False).add_to(mapObj)
+
+            # Create a MarkerCluster
+            circle_cluster = MarkerCluster(name='Circle').add_to(circle_fg)
+            marker_cluster = MarkerCluster(name='Marker').add_to(marker_fg)
+
+            # Color list for crime_types
+            crime_type_colors = {
+                1: "red",    # Violent Crime
+                2: "violet", # Property Crime
+                3: "green",  # Morality Crime
+                4: "blue",   # Statutory Crime
+                5: "orange", # Financial/White Collar Crime
+                6: "pink"    # Cybercrime
             }
-        ).add_to(mapObj)
 
-        circle_fg = folium.FeatureGroup(name="Crime Bubble", show=False).add_to(mapObj)
-        marker_fg = folium.FeatureGroup(name="Crime Marker", show=False).add_to(mapObj)
+            crime_icons = {
+                1: './static/img/violence.png',                                                     # Violent Crime
+                2: './static/img/house.png',                                                        # Property Crime
+                3: './static/img/morality.png',                                                     # Morality Crime
+                4: './static/img/pills.png',                                                        # Statutory Crime
+                5: './static/img/corruption.png',                                                   # Financial/White Collar Crime
+                6: './static/img/cybercrime.png'                                                    # Cybercrime 
+            }
 
-        # Create a MarkerCluster
-        circle_cluster = MarkerCluster(name='Circle').add_to(circle_fg)
-        marker_cluster = MarkerCluster(name='Marker').add_to(marker_fg)
+        
 
-        # Color list for crime_types
-        crime_type_colors = {
-            1: "red",    # Violent Crime
-            2: "violet", # Property Crime
-            3: "green",  # Morality Crime
-            4: "blue",   # Statutory Crime
-            5: "orange", # Financial/White Collar Crime
-            6: "pink"    # Cybercrime
-        }
+            def unicode_to_text(x):
+                return x.encode('ascii','ignore').decode('utf-8')
 
-        crime_icons = {
-            1: './static/img/violence.png',    # Violent Crime
-            2: './static/img/house.png',       # Property Crime
-            3: './static/img/morality.png',    # Morality Crime
-            4: './static/img/pills.png',       # Statutory Crime
-            5: './static/img/corruption.png',  # Financial/White Collar Crime
-            6: './static/img/cybercrime.png'   # Cybercrime
-        }
+            for itr in range(len(df)):
+                latVal          = df.iloc[itr]['latitude']
+                longVal         = df.iloc[itr]['longitude']
+                imgUrl          = df.iloc[itr]['img_url']
+                color           = crime_type_colors[df.iloc[itr]['crime_numeric']]
+                crime_type      = df.iloc[itr]['crime']
+                title           = df.iloc[itr]['title']
+                decoded_title   = unicode_to_text(title)
+                content         = df.iloc[itr]['content']
+                newsUrl         = df.iloc[itr]['news_url']
+                location        = df.iloc[itr]['location']
+                
+                circle_marker = folium.Circle(
+                    location=[latVal, longVal],
+                    radius=1000,
+                    color=color,
+                    weight=2,
+                    fill=True,
+                    opacity=0.05
+                )
 
-        def unicode_to_text(x):
-            return x.encode('ascii', 'ignore').decode('utf-8')
+                html_popup = f"""
+                                    <!DOCTYPE html>
+                                    <html>
+                                    <head>
+                                        <script src='https://cdn.tailwindcss.com'></script>
+                                        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
+                                        <link href='https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap' rel='stylesheet'>
+                                        <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200' />
+                                        <link rel='stylesheet' href='./static/css/main.css'>
+                                        
+                                    </head>
+                                    <body>
+                                        <div class='mb-2 select-none flex justify-between items-center font-inter'>
+                                            <span class='bg-{color}-400 py-1 px-2 font-space rounded-lg text-xs text-white font-semibold'>{crime_type}</span>
+                                            <span class="text-xs text-slate-400" >#{itr}</span>
+                                        </div>
 
-        def process_row(row):
-            latVal = row.latitude
-            longVal = row.longitude
-            imgUrl = row.img_url
-            color = crime_type_colors[row.crime_numeric]
-            crime_type = row.crime
-            title = row.title
-            decoded_title = unicode_to_text(title)
-            content = row.content
-            newsUrl = row.news_url
-            location = row.location
+                                        <div class='mb-3'>
+                                            <span class="w-full font-inter text-sm font-bold" >{decoded_title}</span>
+                                        </div>
 
-            circle_marker = folium.Circle(
-                location=[latVal, longVal],
-                radius=1000,
-                color=color,
-                weight=2,
-                fill=True,
-                opacity=0.05
-            )
+                                        <div class='w-[25rem] h-[13rem]'>
+                                            <div class='w-full h-full flex gap-3'>
+                                                <img src='{imgUrl}' alt='logo' class='w-1/2 h-full select-none'>
+                                                <div class='overflow-y-scroll h-full'>
+                                                    <p class='text-xs font-inter'>{content}</p>
+                                                </div>
+                                            </div>
+                                        </div>
 
-            html_popup = f"""
-                <!DOCTYPE html>
-                <!-- Rest of your HTML popup content -->
-            """
+                                        <div class='flex space-x-2 font-inter my-3' >
+                                            <p class='m-0 p-0 text-xs'> source: </p>
+                                            <a class='text-xs truncate underlined text-sky-600' href='{newsUrl}' target='_blank'>{newsUrl}</a>
+                                        </div>
 
-            popup_iframe = folium.IFrame(width=400, height=400, html=html_popup)
+                                        <div class="mt-4 text-xs text-slate-600 ">
+    
+                                            <p class="text-xs flex items-center ml-3">
+                                                <span class="material-symbols-outlined text-xl mr-1"> location_on </span> 
+                                                <span class='mr-2'> Location: </span>
+                                                <span class='text-sky-600'> {location} </span>
+                                            </p>
 
-            marker_marker = folium.Marker(
-                location=[latVal, longVal],
-                icon=folium.features.CustomIcon(
-                    crime_icons[row.crime_numeric],
-                    icon_size=(50, 50),
-                ),
-                tooltip=crime_type,
-                popup=folium.Popup(popup_iframe)
-            )
+                                            <p class="text-xs flex items-center ml-3">
+                                                <span class="material-symbols-outlined text-xl mr-1"> share_location </span> 
+                                                <span class='mr-2'> Coordinates: </span>
+                                                <span class='text-sky-600'> {latVal} </span>,  
+                                                <span class='text-sky-600'> {longVal} </span>
+                                            </p>
 
-            # Add the marker to the MarkerCluster
-            circle_marker.add_to(circle_cluster)
-            marker_marker.add_to(marker_cluster)
+                                        </div>
 
-        # Create a ThreadPoolExecutor
-        with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:  # Adjust max_workers as needed
-            futures = [executor.submit(process_row, row) for row in df.itertuples()]
+                                    </body>
+                                    </html>
+                                """
 
-        # Wait for all tasks to complete
-        concurrent.futures.wait(futures)
+                popup_iframe = folium.IFrame(width=400, height=400, html=html_popup)
 
-        circle_fg.add_to(mapObj)
+                marker_marker = folium.Marker(
+                                    location=[latVal, longVal],
+                                    tooltip=crime_type,
+                                    popup=folium.Popup(popup_iframe),
+                                    icon=folium.Icon(color=color)
+                                ).add_to(mapObj)
 
-        # Group by latitude and longitude and calculate the total number of crimes
-        heatmap_data = df.groupby(['latitude', 'longitude'])['crime_numeric'].sum().reset_index()
+                # Add the marker to the MarkerCluster
+                circle_marker.add_to(circle_cluster)
+                marker_marker.add_to(marker_cluster)
 
-        # Create a heatmap using the total number of crimes
-        heat_data = [[row['latitude'], row['longitude'], row['crime_numeric']] for index, row in heatmap_data.iterrows()]
+            # Add the MarkerCluster to your map
+            circle_marker.add_to(circle_fg)
+            marker_cluster.add_to(marker_fg)
 
-        # Add the heatmap layer with the 'overlay' parameter set to True
-        heatmap_layer = HeatMap(heat_data, name='Crime Heatmap').add_to(mapObj)
-        heatmap_layer.add_to(mapObj)
+            circle_fg.add_to(mapObj)
 
-        # Add a Layer Control
-        folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
+            # Group by latitude and longitude and calculate the total number of crimes
+            heatmap_data = df.groupby(['latitude', 'longitude'])['crime_numeric'].sum().reset_index()
 
-        context = {'map': mapObj._repr_html_()}
+            # Create a heatmap using the total number of crimes
+            heat_data = [[row['latitude'], row['longitude'], row['crime_numeric']] for index, row in heatmap_data.iterrows()]
 
-        return render(request, 'app/analytics.html', context)
+            # Add the heatmap layer with the 'overlay' parameter set to True
+            heatmap_layer = HeatMap(heat_data, name='Crime Heatmap').add_to(mapObj)
+            heatmap_layer.add_to(mapObj)  
+
+            # Add a Layer Control 
+            folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
+
+            context = {'map': mapObj._repr_html_()}
+
+            return render(request, 'app/analytics.html', context)
 
 
 
