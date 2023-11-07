@@ -230,10 +230,18 @@ class AnalyticsView(LoginRequiredMixin, View):
         def unicode_to_text(x):
             return x.encode('ascii','ignore').decode('utf-8')
         
-        def create_marker_circle(data):
-            (latVal, longVal, imgUrl, color, crime_type, decoded_title, content, newsUrl, location, itr) = data
+        def create_marker_and_circle(row):
+            latVal  = row['latitude']
+            longVal = row['longitude']
+            imgUrl = row['img_url']
+            color = crime_type_colors[row['crime_numeric']]
+            crime_type = row['crime']
+            title = row['title']
+            decoded_title = unicode_to_text(title)
+            content = row['content']
+            newsUrl = row['news_url']
+            location = row['location']
 
-            # Create circle marker
             circle_marker = folium.Circle(
                 location=[latVal, longVal],
                 radius=1000,
@@ -243,7 +251,6 @@ class AnalyticsView(LoginRequiredMixin, View):
                 opacity=0.05
             )
 
-            # Create HTML popup content
             html_popup = f"""
                                 <!DOCTYPE html>
                                 <html>
@@ -256,9 +263,8 @@ class AnalyticsView(LoginRequiredMixin, View):
                                     
                                 </head>
                                 <body>
-                                    <div class='mb-2 select-none flex justify-between items-center font-inter'>
+                                    <div class='mb-2 select-none font-inter'>
                                         <span class='bg-{color}-400 py-1 px-2 font-space rounded-lg text-xs text-white font-semibold'>{crime_type}</span>
-                                        <span class="text-xs text-slate-400" >#{itr}</span>
                                     </div>
 
                                     <div class='mb-3'>
@@ -302,41 +308,27 @@ class AnalyticsView(LoginRequiredMixin, View):
 
             popup_iframe = folium.IFrame(width=400, height=400, html=html_popup)
 
-            # Create marker
             marker_marker = folium.Marker(
                 location=[latVal, longVal],
                 icon=folium.features.CustomIcon(
-                    crime_icons[df.iloc[itr]['crime_numeric']],
+                    crime_icons[row['crime_numeric']],
                     icon_size=(50, 50),
                 ),
                 tooltip=crime_type,
                 popup=folium.Popup(popup_iframe)
-            ).add_to(mapObj)
+            )
 
-            # Add the marker to the MarkerCluster
             circle_marker.add_to(circle_cluster)
             marker_marker.add_to(marker_cluster)
 
-        # Create a list of data rows
-        data_rows = [
-            (
-                df.iloc[itr]['latitude'],
-                df.iloc[itr]['longitude'],
-                df.iloc[itr]['img_url'],
-                crime_type_colors[df.iloc[itr]['crime_numeric']],
-                df.iloc[itr]['crime'],
-                unicode_to_text(df.iloc[itr]['title']),
-                df.iloc[itr]['content'],
-                df.iloc[itr]['news_url'],
-                df.iloc[itr]['location'],
-                itr
-            )
-            for itr in range(len(df))
-        ]
+            return circle_marker, marker_marker
 
-        # Use parallel processing to create markers and circles concurrently
+        # Use concurrent.futures to parallelize marker and circle creation
+        markers_and_circles = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(create_marker_circle, data_rows)
+            futures = [executor.submit(create_marker_and_circle, row) for _, row in df.iterrows()]
+            for future in concurrent.futures.as_completed(futures):
+                markers_and_circles.extend(future.result())
 
         # Group by latitude and longitude and calculate the total number of crimes
         heatmap_data = df.groupby(['latitude', 'longitude'])['crime_numeric'].sum().reset_index()
