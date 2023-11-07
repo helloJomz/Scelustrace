@@ -3,14 +3,17 @@ $(document).ready(function() {
     load_bubble()
 
     $("#show_bubble").click(function(){
+        $("#main_map").empty()
         load_bubble()
     })
     
     $("#show_heatmap").click(function(){
+        $("#main_map").empty()
         load_heatmap()
     })
 
     $("#show_marker").click(function(){
+        $("#main_map").empty()
         load_marker()
     })
 
