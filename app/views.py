@@ -174,7 +174,6 @@ class ClusteringView(LoginRequiredMixin, View):
 
 class AnalyticsView(LoginRequiredMixin, View):
     def get(self, request):
-
         # Load your data from a CSV file
         df = pd.read_csv('./static/csv/gmanews.csv')
 
@@ -184,13 +183,6 @@ class AnalyticsView(LoginRequiredMixin, View):
         # Create a Folium map
         mapObj = folium.Map(location=[14.6760, 121.0437], zoom_start=12, max_bounds=True, zoomControl=False, tiles='cartodbpositron')
 
-        fig = Figure(height="100%")
-        fig.add_child(mapObj)
-
-        # Add a light mode tile layer
-        folium.TileLayer('cartodbdark_matter').add_to(mapObj)
-
-        # Create a GeoJSON layer for Quezon City
         folium.GeoJson(
             data='./static/csv/quezoncity_eastern_manila.geojson',
             name='Q.C. Border',
@@ -201,12 +193,10 @@ class AnalyticsView(LoginRequiredMixin, View):
             }
         ).add_to(mapObj)
 
-        circle_fg = folium.FeatureGroup(name="Crime Bubble", show=False).add_to(mapObj)
-        marker_fg = folium.FeatureGroup(name="Crime Marker", show=False).add_to(mapObj)
 
-        # Create a MarkerCluster
-        circle_cluster = MarkerCluster(name='Circle').add_to(circle_fg)
-        marker_cluster = MarkerCluster(name='Marker').add_to(marker_fg)
+        # Create feature groups for clusters
+        circle_cluster = MarkerCluster(name='Circle Cluster').add_to(mapObj)
+        marker_cluster = MarkerCluster(name='Marker Cluster').add_to(mapObj)
 
         # Color list for crime_types
         crime_type_colors = {
@@ -227,17 +217,14 @@ class AnalyticsView(LoginRequiredMixin, View):
             6: './static/img/cybercrime.png'                                                    # Cybercrime 
         }
 
-        def unicode_to_text(x):
-            return x.encode('ascii','ignore').decode('utf-8')
-        
-        def create_marker_and_circle(row):
-            latVal  = row['latitude']
+        def create_marker(row):
+            latVal = row['latitude']
             longVal = row['longitude']
             imgUrl = row['img_url']
             color = crime_type_colors[row['crime_numeric']]
             crime_type = row['crime']
             title = row['title']
-            decoded_title = unicode_to_text(title)
+            decoded_title = title.encode('ascii', 'ignore').decode('utf-8')
             content = row['content']
             newsUrl = row['news_url']
             location = row['location']
@@ -252,83 +239,70 @@ class AnalyticsView(LoginRequiredMixin, View):
             )
 
             html_popup = f"""
-                                <!DOCTYPE html>
-                                <html>
-                                <head>
-                                    <script src='https://cdn.tailwindcss.com'></script>
-                                    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
-                                    <link href='https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap' rel='stylesheet'>
-                                    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200' />
-                                    <link rel='stylesheet' href='./static/css/main.css'>
-                                    
-                                </head>
-                                <body>
-                                    <div class='mb-2 select-none font-inter'>
-                                        <span class='bg-{color}-400 py-1 px-2 font-space rounded-lg text-xs text-white font-semibold'>{crime_type}</span>
-                                    </div>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
+                </head>
+                <body>
+                    <div class='mb-2'>
+                        <span class='bg-{color}-400 py-1 px-2 rounded-lg text-xs text-white font-semibold'>{crime_type}</span>
+                    </div>
 
-                                    <div class='mb-3'>
-                                        <span class="w-full font-inter text-sm font-bold" >{decoded_title}</span>
-                                    </div>
+                    <div class='mb-3'>
+                        <span class="w-full text-sm font-bold">{decoded_title}</span>
+                    </div>
 
-                                    <div class='w-[25rem] h-[13rem]'>
-                                        <div class='w-full h-full flex gap-3'>
-                                            <img src='{imgUrl}' alt='logo' class='w-1/2 h-full select-none'>
-                                            <div class='overflow-y-scroll h-full'>
-                                                <p class='text-xs font-inter'>{content}</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                    <div class='w-[25rem] h-[13rem]'>
+                        <div class='w-full h-full'>
+                            <img src='{imgUrl}' alt='logo' class='w-1/2 h-full'>
+                            <div class='overflow-y-scroll h-full'>
+                                <p class='text-xs'>{content}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <div class='flex space-x-2 font-inter my-3' >
-                                        <p class='m-0 p-0 text-xs'> source: </p>
-                                        <a class='text-xs truncate underlined text-sky-600' href='{newsUrl}' target='_blank'>{newsUrl}</a>
-                                    </div>
+                    <div class='flex space-x-2 my-3'>
+                        <p class='text-xs'>Source:</p>
+                        <a class='text-xs truncate underlined text-sky-600' href='{newsUrl}' target='_blank'>{newsUrl}</a>
+                    </div>
 
-                                    <div class="mt-4 text-xs text-slate-600 ">
-   
-                                        <p class="text-xs flex items-center ml-3">
-                                            <span class="material-symbols-outlined text-xl mr-1"> location_on </span> 
-                                            <span class='mr-2'> Location: </span>
-                                            <span class='text-sky-600'> {location} </span>
-                                        </p>
-
-                                        <p class="text-xs flex items-center ml-3">
-                                            <span class="material-symbols-outlined text-xl mr-1"> share_location </span> 
-                                            <span class='mr-2'> Coordinates: </span>
-                                            <span class='text-sky-600'> {latVal} </span>,  
-                                            <span class='text-sky-600'> {longVal} </span>
-                                        </p>
-
-                                    </div>
-
-                                </body>
-                                </html>
-                            """
+                    <div class="mt-4 text-xs text-slate-600">
+                        <p class="text-xs">
+                            <span class="material-symbols-outlined text-xl">location_on</span> 
+                            <span class='ml-2'>Location: {location}</span>
+                        </p>
+                        <p class="text-xs">
+                            <span class="material-symbols-outlined text-xl">share_location</span> 
+                            <span class='ml-2'>Coordinates: {latVal}, {longVal}</span>
+                        </p>
+                    </div>
+                </body>
+                </html>
+            """
 
             popup_iframe = folium.IFrame(width=400, height=400, html=html_popup)
 
             marker_marker = folium.Marker(
                 location=[latVal, longVal],
-                icon=folium.features.CustomIcon(
-                    crime_icons[row['crime_numeric']],
+                icon=folium.CustomIcon(
+                    icon_image=crime_icons[row['crime_numeric']],
                     icon_size=(50, 50),
                 ),
                 tooltip=crime_type,
                 popup=folium.Popup(popup_iframe)
             )
 
-            circle_marker.add_to(circle_cluster)
-            marker_marker.add_to(marker_cluster)
-
             return circle_marker, marker_marker
 
         # Use concurrent.futures to parallelize marker and circle creation
         markers_and_circles = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = [executor.submit(create_marker_and_circle, row) for _, row in df.iterrows()]
+            futures = [executor.submit(create_marker, row) for _, row in df.iterrows()]
             for future in concurrent.futures.as_completed(futures):
-                markers_and_circles.extend(future.result())
+                circle_marker, marker_marker = future.result()
+                circle_marker.add_to(circle_cluster)
+                marker_marker.add_to(marker_cluster)
 
         # Group by latitude and longitude and calculate the total number of crimes
         heatmap_data = df.groupby(['latitude', 'longitude'])['crime_numeric'].sum().reset_index()
@@ -337,8 +311,7 @@ class AnalyticsView(LoginRequiredMixin, View):
         heat_data = [[row['latitude'], row['longitude'], row['crime_numeric']] for index, row in heatmap_data.iterrows()]
 
         # Add the heatmap layer with the 'overlay' parameter set to True
-        heatmap_layer = HeatMap(heat_data, name='Crime Heatmap').add_to(mapObj)
-        heatmap_layer.add_to(mapObj)  
+        heatmap_layer = HeatMap(heat_data, name='Crime Heatmap', overlay=True).add_to(mapObj)
 
         # Add a Layer Control 
         folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
