@@ -17,6 +17,7 @@ whitenoise = "*"
 wordcloud = "*"
 folium = "*"
 branca = "*"
+unidecode = "*"
 
 [dev-packages]
 
