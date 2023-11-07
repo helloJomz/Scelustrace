@@ -18,7 +18,6 @@ from io import BytesIO
 import base64
 from wordcloud import WordCloud
 import concurrent.futures
-import unicodedata
 
 import matplotlib
 matplotlib.use('Agg')
