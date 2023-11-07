@@ -227,23 +227,13 @@ class AnalyticsView(LoginRequiredMixin, View):
             6: './static/img/cybercrime.png'                                                    # Cybercrime 
         }
 
-      
-
         def unicode_to_text(x):
             return x.encode('ascii','ignore').decode('utf-8')
+        
+        def create_marker_circle(data):
+            (latVal, longVal, imgUrl, color, crime_type, decoded_title, content, newsUrl, location, itr) = data
 
-        for itr in range(len(df)):
-            latVal          = df.iloc[itr]['latitude']
-            longVal         = df.iloc[itr]['longitude']
-            imgUrl          = df.iloc[itr]['img_url']
-            color           = crime_type_colors[df.iloc[itr]['crime_numeric']]
-            crime_type      = df.iloc[itr]['crime']
-            title           = df.iloc[itr]['title']
-            decoded_title   = unicode_to_text(title)
-            content         = df.iloc[itr]['content']
-            newsUrl         = df.iloc[itr]['news_url']
-            location        = df.iloc[itr]['location']
-            
+            # Create circle marker
             circle_marker = folium.Circle(
                 location=[latVal, longVal],
                 radius=1000,
@@ -253,6 +243,7 @@ class AnalyticsView(LoginRequiredMixin, View):
                 opacity=0.05
             )
 
+            # Create HTML popup content
             html_popup = f"""
                                 <!DOCTYPE html>
                                 <html>
@@ -311,39 +302,41 @@ class AnalyticsView(LoginRequiredMixin, View):
 
             popup_iframe = folium.IFrame(width=400, height=400, html=html_popup)
 
+            # Create marker
             marker_marker = folium.Marker(
-                                location=[latVal, longVal],
-                                icon=folium.features.CustomIcon(
-                                    crime_icons[df.iloc[itr]['crime_numeric']],
-                                    icon_size=(50, 50),
-                                ),
-                                tooltip=crime_type,
-                                popup=folium.Popup(popup_iframe)
-                            ).add_to(mapObj)
+                location=[latVal, longVal],
+                icon=folium.features.CustomIcon(
+                    crime_icons[df.iloc[itr]['crime_numeric']],
+                    icon_size=(50, 50),
+                ),
+                tooltip=crime_type,
+                popup=folium.Popup(popup_iframe)
+            ).add_to(mapObj)
 
             # Add the marker to the MarkerCluster
             circle_marker.add_to(circle_cluster)
             marker_marker.add_to(marker_cluster)
 
-        # Add the MarkerCluster to your map
-        circle_marker.add_to(circle_fg)
-        marker_cluster.add_to(marker_fg)
+        # Create a list of data rows
+        data_rows = [
+            (
+                df.iloc[itr]['latitude'],
+                df.iloc[itr]['longitude'],
+                df.iloc[itr]['img_url'],
+                crime_type_colors[df.iloc[itr]['crime_numeric']],
+                df.iloc[itr]['crime'],
+                unicode_to_text(df.iloc[itr]['title']),
+                df.iloc[itr]['content'],
+                df.iloc[itr]['news_url'],
+                df.iloc[itr]['location'],
+                itr
+            )
+            for itr in range(len(df))
+        ]
 
-        circle_legend = """
-        <div id="legend" style="position: fixed; bottom: 50px; left: 50px; width: 150px; background-color: white; border: 2px solid grey; z-index: 9999; font-size: 14px;">
-            <p style="margin: 10px; text-align: center;">Legend</p>
-            <p style="margin: 10px;">Violent Crime <span style="background-color: red; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
-            <p style="margin: 10px;">Property Crime <span style="background-color: violet; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
-            <p style="margin: 10px;">Morality Crime <span style="background-color: green; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
-            <p style="margin: 10px;">Statutory Crime <span style="background-color: purple; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
-            <p style="margin: 10px;">Financial/White Collar Crime <span style="background-color: orange; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
-            <p style="margin: 10px;">Cybercrime <span style="background-color: pink; color: white;">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
-        </div>
-        """
-
-        # Add the legend to the map
-        mapObj.add_child(folium.Element(circle_legend))
-        circle_fg.add_to(mapObj)
+        # Use parallel processing to create markers and circles concurrently
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(create_marker_circle, data_rows)
 
         # Group by latitude and longitude and calculate the total number of crimes
         heatmap_data = df.groupby(['latitude', 'longitude'])['crime_numeric'].sum().reset_index()
