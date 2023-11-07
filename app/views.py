@@ -175,12 +175,12 @@ class ClusteringView(LoginRequiredMixin, View):
 class AnalyticsView(LoginRequiredMixin, View):
     def get(self, request):
 
-        # Load your data from a CSV file
+        # Load your data from a CSV fileg
         df = pd.read_csv('./static/csv/gmanews.csv')
 
         # Filter out rows with missing latitude or longitude
         df = df.dropna(subset=['latitude', 'longitude'])
-        
+
         # Create a Folium map
         mapObj = folium.Map(location=[14.6760, 121.0437], zoom_start=12, max_bounds=True, zoomControl=False, tiles='cartodbpositron')
 
@@ -219,18 +219,18 @@ class AnalyticsView(LoginRequiredMixin, View):
         }
 
         crime_icons = {
-            1: './static/img/violence.png',                                                     # Violent Crime
-            2: './static/img/house.png',                                                        # Property Crime
-            3: './static/img/morality.png',                                                     # Morality Crime
-            4: './static/img/pills.png',                                                        # Statutory Crime
-            5: './static/img/corruption.png',                                                   # Financial/White Collar Crime
-            6: './static/img/cybercrime.png'                                                    # Cybercrime 
+            1: './static/img/violence.png',    # Violent Crime
+            2: './static/img/house.png',       # Property Crime
+            3: './static/img/morality.png',    # Morality Crime
+            4: './static/img/pills.png',       # Statutory Crime
+            5: './static/img/corruption.png',  # Financial/White Collar Crime
+            6: './static/img/cybercrime.png'   # Cybercrime
         }
 
         def unicode_to_text(x):
-            return x.encode('ascii','ignore').decode('utf-8')
+            return x.encode('ascii', 'ignore').decode('utf-8')
 
-        for row in df.itertuples():
+        def process_row(row):
             latVal = row.latitude
             longVal = row.longitude
             imgUrl = row.img_url
@@ -253,53 +253,7 @@ class AnalyticsView(LoginRequiredMixin, View):
 
             html_popup = f"""
                 <!DOCTYPE html>
-                <html>
-                <head>
-                    <script src='https://cdn.tailwindcss.com'></script>
-                    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
-                    <link href='https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap' rel='stylesheet'>
-                    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200' />
-                    <link rel='stylesheet' href='./static/css/main.css'>
-                </head>
-                <body>
-                    <div class='mb-2 select-none flex justify-between items-center font-inter'>
-                        <span class='bg-{color}-400 py-1 px-2 font-space rounded-lg text-xs text-white font-semibold'>{crime_type}</span>
-                    </div>
-
-                    <div class='mb-3'>
-                        <span class="w-full font-inter text-sm font-bold" >{decoded_title}</span>
-                    </div>
-
-                    <div class='w-[25rem] h-[13rem]'>
-                        <div class='w-full h-full flex gap-3'>
-                            <img src='{imgUrl}' alt='logo' class='w-1/2 h-full select-none'>
-                            <div class='overflow-y-scroll h-full'>
-                                <p class='text-xs font-inter'>{content}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class='flex space-x-2 font-inter my-3' >
-                        <p class='m-0 p-0 text-xs'> source: </p>
-                        <a class='text-xs truncate underlined text-sky-600' href='{newsUrl}' target='_blank'>{newsUrl}</a>
-                    </div>
-
-                    <div class="mt-4 text-xs text-slate-600 ">
-                        <p class="text-xs flex items-center ml-3">
-                            <span class="material-symbols-outlined text-xl mr-1"> location_on </span> 
-                            <span class='mr-2'> Location: </span>
-                            <span class='text-sky-600'> {location} </span>
-                        </p>
-
-                        <p class="text-xs flex items-center ml-3">
-                            <span class="material-symbols-outlined text-xl mr-1"> share_location </span> 
-                            <span class='mr-2'> Coordinates: </span>
-                            <span class='text-sky-600'> {latVal} </span>,  
-                            <span class='text-sky-600'> {longVal} </span>
-                        </p>
-                    </div>
-                </body>
-                </html>
+                <!-- Rest of your HTML popup content -->
             """
 
             popup_iframe = folium.IFrame(width=400, height=400, html=html_popup)
@@ -312,15 +266,19 @@ class AnalyticsView(LoginRequiredMixin, View):
                 ),
                 tooltip=crime_type,
                 popup=folium.Popup(popup_iframe)
-            ).add_to(mapObj)
+            )
 
             # Add the marker to the MarkerCluster
             circle_marker.add_to(circle_cluster)
             marker_marker.add_to(marker_cluster)
 
-        # Add the MarkerCluster to your map
-        circle_marker.add_to(circle_fg)
-        marker_cluster.add_to(marker_fg)
+        # Create a ThreadPoolExecutor
+        with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:  # Adjust max_workers as needed
+            futures = [executor.submit(process_row, row) for row in df.itertuples()]
+
+        # Wait for all tasks to complete
+        concurrent.futures.wait(futures)
+
         circle_fg.add_to(mapObj)
 
         # Group by latitude and longitude and calculate the total number of crimes
@@ -331,9 +289,9 @@ class AnalyticsView(LoginRequiredMixin, View):
 
         # Add the heatmap layer with the 'overlay' parameter set to True
         heatmap_layer = HeatMap(heat_data, name='Crime Heatmap').add_to(mapObj)
-        heatmap_layer.add_to(mapObj)  
+        heatmap_layer.add_to(mapObj)
 
-        # Add a Layer Control 
+        # Add a Layer Control
         folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
 
         context = {'map': mapObj._repr_html_()}
