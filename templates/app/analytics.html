@@ -24,7 +24,7 @@
 
 <body class="h-full w-full bg-white content opacity-0 animate-opacity">
     
-    <div class="fixed w-fit top-0 mt-5 ms-[4rem] lg:ms-[7rem] z-[1000]">
+    <div class="fixed flex space-x-3 w-fit top-0 mt-5 ms-[4rem] lg:ms-[7rem] z-[1000]">
 
         <div class="flex space-x-3 items-center bg-white pl-[1rem] pr-[0.4rem] py-[0.3rem] rounded-[3rem] select-none hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
             <div>
@@ -33,6 +33,18 @@
             <div>
                 <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[1.2rem] h-[1.2rem] lg:w-[2rem] lg:h-[2rem] object-cover ">
             </div>
+        </div>
+
+        <div id="show_bubble" class="bg-white">
+            Bubble
+        </div>
+
+        <div id="show_heatmap" class="bg-white">
+            HeatMap
+        </div>
+
+        <div id="show_marker" class="bg-white">
+            Marker
         </div>
     </div>
 
@@ -77,8 +89,8 @@
             
         </div>
 
-        <div class="h-screen w-full ">
-            {{ map | safe }}
+        <div id="main_map" class="h-screen w-full ">
+            
         </div>
 
         <div class="fixed bottom-0 left-0 bg-white rounded-xl mb-8  ml-[4rem] lg:ml-[7rem] z-[1000] text-xs p-2 font-inter cursor-pointer select-none hover:bg-[#d9dbdb]">
@@ -157,48 +169,7 @@
             </div>
         </div>
         
-        <script>
-            $(document).ready(function() {
-
-                // Click event on the legend menu to show the legend container
-                $("#legend-menu").click(function() {
-                    $(this).hide();
-                    $("#legend-container").show();
-                    $("#close-legend").show();
-                });
-
-                $("#close-legend").click(function() {
-                    $(this).hide();
-                    $("#legend-container").hide();
-                    $("#legend-menu").show();
-                })
-
-                // Show content-0 by default
-                $('.content-0').removeClass('hidden');
-                $('.content-1').addClass('hidden');
-
-                $('.legend-button').click(function() {
-                    var buttonIndex = $('.legend-button').index(this);
-            
-                    // Remove bg-slate-200 from all buttons
-                    $('.legend-button').removeClass('bg-slate-200');
-            
-                    if (buttonIndex === 0) {
-                        // Clicked the HeatMap button
-                        $('.content-0').removeClass('hidden');
-                        $('.content-1').addClass('hidden');
-                        // Add bg-slate-200 to HeatMap button
-                        $(this).addClass('bg-slate-200');
-                    } else if (buttonIndex === 1) {
-                        // Clicked the Bubble button
-                        $('.content-0').addClass('hidden');
-                        $('.content-1').removeClass('hidden');
-                        // Add bg-slate-200 to Bubble button
-                        $(this).addClass('bg-slate-200');
-                    }
-                });
-            });
-        </script>
+        <script src="{% static 'js/analytics.js' %}"></script>
 
     </div>
 
