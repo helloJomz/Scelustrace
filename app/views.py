@@ -20,6 +20,7 @@ from wordcloud import WordCloud
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 from django.views.decorators.csrf import csrf_exempt
+from cachetools import cached, TTLCache
 
 
 import matplotlib
@@ -184,6 +185,7 @@ def create_circle_marker(latVal, longVal, color):
 )
 
 
+@login_required
 @csrf_exempt
 def load_bubble(request):
     df = pd.read_csv('./static/csv/gmanews.csv')
@@ -291,8 +293,12 @@ def load_heatmap(request):
     return JsonResponse(context)
 
 
-@csrf_exempt
-def load_marker(request):
+
+
+
+
+
+def generate_marker_map():
     df = pd.read_csv('./static/csv/gmanews.csv')
 
     # Filter out rows with missing latitude or longitude
@@ -341,13 +347,10 @@ def load_marker(request):
     def create_marker(itr):
         latVal          = df.iloc[itr]['latitude']
         longVal         = df.iloc[itr]['longitude']
-        imgUrl          = df.iloc[itr]['img_url']
         color           = crime_type_colors[df.iloc[itr]['crime_numeric']]
         crime_type      = df.iloc[itr]['crime']
         title           = df.iloc[itr]['title']
         decoded_title   = unicode_to_text(title)
-        content         = df.iloc[itr]['content']
-        newsUrl         = df.iloc[itr]['news_url']
         location        = df.iloc[itr]['location']
             
         html_popup = f"""
@@ -397,11 +400,24 @@ def load_marker(request):
     #Add a Layer Control 
     folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
 
-    context = {'map': mapObj._repr_html_()}
-    
+    return mapObj._repr_html_()
+
+
+def load_marker(request):
+
+    # Attempt to retrieve the marker map HTML from the cache
+    marker_map_html = cache.get('cached_marker_map')
+
+    if marker_map_html is None:
+        # If not found in the cache, generate the marker map HTML
+        marker_map_html = generate_marker_map()  # Replace with your marker map generation code
+
+        # Store the generated marker map HTML in the cache with a timeout (e.g., 3600 seconds)
+        cache.set('cached_marker_map', marker_map_html, None)
+
+    context = {'map': marker_map_html}
+
     return JsonResponse(context)
-
-
 
 
 class AnalyticsView(LoginRequiredMixin, View):

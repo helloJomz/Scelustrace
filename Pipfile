@@ -18,6 +18,7 @@ wordcloud = "*"
 folium = "*"
 branca = "*"
 unidecode = "*"
+cachetools = "*"
 
 [dev-packages]
 

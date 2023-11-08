@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+    var cachedMapHtml = null;
+
     load_bubble()
 
     $("#show_bubble").click(function(){
@@ -20,7 +22,7 @@ $(document).ready(function() {
     function load_bubble() {
         $.ajax({
             url: "load_bubble/", 
-            method: "POST",
+            method: "GET",
             cache: false,
             success: function(data) {
                 
@@ -43,14 +45,17 @@ $(document).ready(function() {
     }
 
     function load_marker() {
-        $.ajax({
-            url: "load_marker/", 
-            method: "POST",
-            cache: false,
-            success: function(data) {
-                
-                $("#main_map").html(data.map)
-            }
-        })
+
+            $.ajax({
+                url: "load_marker/", 
+                method: "GET",
+                success: function(data) {
+
+                    $("#main_map").html(data.map)
+                    
+                }
+            })
+        
+        
     }
 });
