@@ -351,62 +351,29 @@ def load_marker(request):
         location        = df.iloc[itr]['location']
             
         html_popup = f"""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <script src='https://cdn.tailwindcss.com'></script>
-                    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
-                    <link href='https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap' rel='stylesheet'>
-                    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200' />
-                    <link rel='stylesheet' href='./static/css/main.css'>
-                    
-                </head>
-                <body>
-                    <div class='mb-2 select-none flex justify-between items-center font-inter'>
-                        <span class='bg-{color}-400 py-1 px-2 font-space rounded-lg text-xs text-white font-semibold'>{crime_type}</span>
-                        <span class="text-xs text-slate-400" >#{itr}</span>
+                    <div style="margin-bottom: 1rem; user-select: none; font-family: 'Inter', sans-serif;" >
+                        <span style="background-color: {color}; padding-top: 0.25rem; padding-bottom: 0.25rem; padding-left: 0.5rem; padding-right: 0.5rem; letter-spacing: 0.1em; border-radius: 0.5rem; font-size: 0.75rem; color: #ffffff; font-weight: 600;" >{crime_type}</span>
                     </div>
 
-                    <div class='mb-3'>
-                        <span class="w-full font-inter text-sm font-bold" >{decoded_title}</span>
-                    </div>
-
-                    <div class='w-[25rem] h-[13rem]'>
-                        <div class='w-full h-full flex gap-3'>
-                            <img src='{imgUrl}' alt='logo' class='w-1/2 h-full select-none'>
-                            <div class='overflow-y-scroll h-full'>
-                                <p class='text-xs font-inter'>{content}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class='flex space-x-2 font-inter my-3' >
-                        <p class='m-0 p-0 text-xs'> source: </p>
-                        <a class='text-xs truncate underlined text-sky-600' href='{newsUrl}' target='_blank'>{newsUrl}</a>
+                    <div style="margin-bottom: 1rem;" >
+                        <span style="font-size: 0.875rem; font-weight: bold;" >{decoded_title}</span>
                     </div>
 
                     <div class="mt-4 text-xs text-slate-600 ">
 
                         <p class="text-xs flex items-center ml-3">
-                            <span class="material-symbols-outlined text-xl mr-1"> location_on </span> 
-                            <span class='mr-2'> Location: </span>
                             <span class='text-sky-600'> {location} </span>
                         </p>
 
                         <p class="text-xs flex items-center ml-3">
-                            <span class="material-symbols-outlined text-xl mr-1"> share_location </span> 
-                            <span class='mr-2'> Coordinates: </span>
-                            <span class='text-sky-600'> {latVal} </span>,  
-                            <span class='text-sky-600'> {longVal} </span>
+                            <span>Coordinates:</span>
+                            <span style="color: #0284C7">{latVal}</span>,  
+                            <span style="color: #0284C7">{longVal}</span>
                         </p>
-
                     </div>
-
-                </body>
-                </html>
             """
         
-        popup_iframe = folium.IFrame(width=400, height=400, html=html_popup)
+        popup_iframe = folium.IFrame(width=200, height=150, html=html_popup)
 
         marker_marker = folium.Marker(
             location=[latVal, longVal],
