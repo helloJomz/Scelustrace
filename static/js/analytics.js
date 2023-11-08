@@ -48,24 +48,33 @@ $(document).ready(function() {
     })
 
     function load_bubble() {
+
+        $("#loading_login").css("display", "flex")
+
         $.ajax({
             url: "load_bubble/", 
             method: "GET",
             success: function(data) {
 
+                $("#loading_login").hide()
                 $("#main_map").html(data.map_circle)
+
             }
         })
     }
     
 
     function load_heatmap() {
+
+        $("#loading_login").css("display", "flex")
+
         $.ajax({
             url: "load_heatmap/", 
             method: "POST",
             cache: false,
             success: function(data) {
-                
+
+                $("#loading_login").hide()
                 $("#main_map").html(data.map)
             }
         })
@@ -73,11 +82,14 @@ $(document).ready(function() {
 
     function load_marker() {
 
+        $("#loading_login").css("display", "flex")
+
         $.ajax({
             url: "load_marker/", 
             method: "GET",
             success: function(data) {
 
+                $("#loading_login").hide()
                 $("#main_map").html(data.map)
                 
             }
