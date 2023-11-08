@@ -26,24 +26,24 @@
     
     <div class="fixed flex space-x-3 w-fit top-0 mt-5 ms-[4rem] lg:ms-[7rem] z-[1000] items-center">
 
-        <div class="flex space-x-3 items-center bg-white pl-[1rem] pr-[0.4rem] py-[0.3rem] rounded-[3rem] select-none hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
+        <div class="flex rounded-full lg:space-x-3 items-center bg-white lg:pl-[1rem] lg:pr-[0.4rem] lg:py-[0.3rem] p-[0.2rem] lg:rounded-[3rem] select-none hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
             <div>
-                <p class="font-inter text-xs lg:text-base font-semibold m-0 ">{{ request.session.user_fullname | title }}</p>
+                <p class="hidden lg:block font-inter text-xs lg:text-base font-semibold m-0 ">{{ request.session.user_fullname | title }}</p>
             </div>
             <div>
                 <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[1.2rem] h-[1.2rem] lg:w-[2rem] lg:h-[2rem] object-cover ">
             </div>
         </div>
 
-        <div id="show_bubble" class="bg-white h-2/3 py-1 px-2 rounded-lg select-none cursor-pointer">
-            <p class="text-sm font-inter">Bubble</p>
+        <div id="show_bubble" class="map-button bg-white h-2/3 py-1 px-2 rounded-lg select-none cursor-pointer hover:bg-sky-300">
+            <p class="text-sm font-inter">Circle</p>
         </div>
 
-        <div id="show_heatmap" class="bg-white h-2/3 py-1 px-2 rounded-lg select-none cursor-pointer">
+        <div id="show_heatmap" class="map-button bg-white h-2/3 py-1 px-2 rounded-lg select-none cursor-pointer hover:bg-sky-300">
             <p class="text-sm font-inter">Heatmap</p>
         </div>
 
-        <div id="show_marker" class="bg-white h-2/3 py-1 px-2 rounded-lg select-none cursor-pointer">
+        <div id="show_marker" class="map-button bg-white h-2/3 py-1 px-2 rounded-lg select-none cursor-pointer hover:bg-sky-300">
             <p class="text-sm font-inter">Marker</p>
         </div>
     </div>

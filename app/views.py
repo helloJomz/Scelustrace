@@ -185,9 +185,7 @@ def create_circle_marker(latVal, longVal, color):
 )
 
 
-@login_required
-@csrf_exempt
-def load_bubble(request):
+def generate_circle_map():
     df = pd.read_csv('./static/csv/gmanews.csv')
 
     # Filter out rows with missing latitude or longitude
@@ -243,11 +241,26 @@ def load_bubble(request):
     for circle_marker in circle_markers:
         circle_marker.add_to(circle_cluster)
 
-    folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
+    return mapObj._repr_html_()
 
-    context = {'map': mapObj._repr_html_()}
-    
+
+@login_required
+@csrf_exempt
+def load_bubble(request):
+    # Attempt to retrieve the marker map HTML from the cache
+    circle_map_html = cache.get('cached_circle_map')
+
+    if circle_map_html is None:
+        # If not found in the cache, generate the circle map HTML
+        circle_map_html = generate_circle_map()  # Replace with your circle map generation code
+
+        # Store the generated circle map HTML in the cache with a timeout (e.g., 3600 seconds)
+        cache.set('cached_circle_map', circle_map_html, None)
+
+    context = {'map_circle': circle_map_html}
+
     return JsonResponse(context)
+    
 
 @csrf_exempt
 def load_heatmap(request):
@@ -285,8 +298,6 @@ def load_heatmap(request):
     # Add the heatmap layer with the 'overlay' parameter set to True
     heatmap_layer = HeatMap(heat_data, name='Crime Heatmap').add_to(mapObj)
     heatmap_layer.add_to(mapObj) 
-
-    folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
 
     context = {'map': mapObj._repr_html_()}
     
@@ -397,8 +408,6 @@ def generate_marker_map():
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(create_marker, range(len(df)))
 
-    #Add a Layer Control 
-    folium.LayerControl(position="topright", collapsed=False).add_to(mapObj)
 
     return mapObj._repr_html_()
 
