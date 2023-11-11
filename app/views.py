@@ -31,6 +31,12 @@ from folium.plugins import HeatMap, MarkerCluster
 from branca.element import Figure
 
 class ClassificationView(LoginRequiredMixin, View):
+
+    def dispatch(self, request, *args, **kwargs):
+        # Set the previous page URL in the session
+        request.session["prev_page"] = request.path
+        return super().dispatch(request, *args, **kwargs)
+    
     def get(self, request):
         list_of_crimes = ListOfCrimes.objects.all()
         return render(request, 'app/classification.html', context={'data':list_of_crimes})
@@ -62,7 +68,10 @@ class ClassificationView(LoginRequiredMixin, View):
     
 @login_required
 def load_fileupload(request):
+    request.session["prev_page"] = request.path
     return render(request, 'app/fileform.html')
+        
+    
 
 
 def generate_wordcloud(cluster_words, cluster_number):
@@ -168,9 +177,18 @@ def process_fileupload(request):
     
 
 class ClusteringView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        # Set the previous page URL in the session
+        request.session["prev_page"] = request.path
+        return super().dispatch(request, *args, **kwargs)
+    
     def get(self, request):
+        request.session["prev_page"] = request.path
         context = cache.get('context_data')
-        return render(request, 'app/clustering.html', context)
+        if context:
+            return render(request, 'app/clustering.html', context)
+        else:
+            return render(request, 'app/fileform.html')
     
 
 
@@ -564,7 +582,14 @@ def load_crime_index(request):
     return JsonResponse(context)
 
 class AnalyticsView(LoginRequiredMixin, View):
+
+    def dispatch(self, request, *args, **kwargs):
+        # Set the previous page URL in the session
+        request.session["prev_page"] = request.path
+        return super().dispatch(request, *args, **kwargs)
+    
     def get(self, request):
+        request.session["prev_page"] = request.path
         return render(request, 'app/analytics.html')
     
 
@@ -599,7 +624,7 @@ class AnalyticsView(LoginRequiredMixin, View):
 
 
 
-
+@csrf_exempt
 @login_required
 def logout_and_clear_sessions(request):
     auth.logout(request)  # Logout the user

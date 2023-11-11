@@ -37,7 +37,11 @@
                 <p class="hidden lg:block font-inter text-xs lg:text-base font-semibold m-0 ">{{ request.session.user_fullname | title }}</p>
             </div>
             <div>
-                <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[1.2rem] h-[1.2rem] lg:w-[2rem] lg:h-[2rem] object-cover ">
+                <img src="{% if request.session.profile_img %} 
+                                {% static 'img/default_img/'|add:request.session.profile_img %} 
+                          {% else %} 
+                                {%static 'img/default_img/8.png' %}
+                          {% endif %}" alt="profile_img" class="rounded-full w-[1.2rem] h-[1.2rem] lg:w-[2rem] lg:h-[2rem] object-cover ">
             </div>
         </div>
 
@@ -96,18 +100,20 @@
 
     
     {% include 'partials/_loading.html' %}
+
+
     <div id="main_map" class="h-screen w-full bg-black"></div>
     
     <div id="analytics-sidebar" class="hidden fixed w-full lg:w-1/3 h-full top-0 left-0 z-[2000] shadow-xl">
         <div class="bg-white w-full bg-white h-full p-5 ">
-            <div class="flex justify-between mb-3">
+            <div class="flex justify-between mb-3 border-light pb-5">
                 <div class="font-bold">
                     <span>Analytics</span>
                 </div>
                 <img id="close_analytics_chart" src="{% static 'img/analytics_close.png' %}" alt="" class="w-[1.5rem] h-[1.5rem] text-end cursor-pointer">
             </div>
 
-            <div class="h-full flex flex-col space-y-3 overflow-y-auto pb-10 ">
+            <div class="h-full flex flex-col space-y-3 overflow-y-auto pb-[3rem] ">
                 <img id="image1" alt="Index Crime Count in QC">
                 <img id="image2" alt="Index Crime Count in QC">
                 

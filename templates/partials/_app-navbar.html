@@ -19,7 +19,12 @@
                     <p class="font-space text-base font-bold m-0 ">{{ request.session.user_fullname | title }}</p>
                 </div>
                 <div>
-                    <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[2rem] h-[2rem] object-cover ">
+                    <img src=" {% if request.session.profile_img %} 
+                                    {% static 'img/default_img/'|add:request.session.profile_img %} 
+                               {% else %} 
+                                    {%static 'img/default_img/8.png' %} 
+                               {% endif %}" 
+                               alt="profile_img" class="rounded-full w-[2rem] h-[2rem] object-cover ">
                 </div>
             </div>
             

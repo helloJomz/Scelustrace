@@ -20,7 +20,11 @@
     
             <div class="py-[1.5rem] flex space-x-3 items-center">
                 <div class="">
-                    <img src="{%static 'img/ranking-of-kings-bojji.webp' %}" alt="profile_img" class="rounded-full w-[5rem] h-[5rem] object-cover">
+                    <img src="{% if request.session.profile_img%} 
+                                {% static 'img/default_img/'|add:request.session.profile_img %} 
+                              {% else %} 
+                                {%static 'img/default_img/8.png' %} 
+                              {% endif %}" alt="profile_img" class="rounded-full w-[5rem] h-[5rem] object-cover">
                 </div>
     
                 <div class="flex flex-col space-y-1">
