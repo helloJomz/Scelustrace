@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scelustrace | Analytics</title>
+    <title>Scelustrace | Crime Mapping — Analytics</title>
 
     <!-- DEPENDENCIES -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,7 +24,12 @@
 
 <body class="h-full w-full bg-white content opacity-0 animate-opacity">
     
-    <div class="fixed flex space-x-3 w-fit top-0 mt-5 ms-[4rem] lg:ms-[7rem] z-[1000] items-center">
+    <div id="menu_wrapper_parent" class="fixed flex space-x-3 w-fit top-0 mt-5 ms-[1rem] lg:ms-[7rem] z-[1000] items-center">
+
+        <div id="mobile_menu_button" class="rounded-full p-[0.3rem] bg-white full select-none hover:bg-[#d9dbdb] select-none lg:hidden">
+            <img id="1st_btn" src="{%static 'img/analytics_menu.png' %}" alt="profile_img" class="rounded-full w-[1rem] h-[1rem] object-cover ">
+            <img id="2nd_btn" src="{%static 'img/analytics_close.png' %}" alt="profile_img" class="hidden rounded-full w-[1rem] h-[1rem] object-cover ">
+        </div>
 
         <div class="flex rounded-full lg:space-x-3 items-center bg-white lg:pl-[1rem] lg:pr-[0.4rem] lg:py-[0.3rem] p-[0.2rem] lg:rounded-[3rem] select-none hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
             <div>
@@ -52,7 +57,7 @@
 
     <div class="flex">
 
-        <div id="mobile-sidebar" class="fixed h-full fixed top-0 w-[3rem] lg:w-[5rem] h-full bg-white z-[1000] shadow-xl ">
+        <div id="mobile-sidebar" class="hidden fixed lg:block h-full top-0 w-[3rem] lg:w-[5rem] h-full bg-white z-[1000] shadow-xl ">
             <div class="py-[2rem] px-[0.5rem] space-y-7 font-inter h-1/2">
 
                 <div class="border-light pb-10 cursor-pointer">
@@ -95,7 +100,7 @@
             
         </div>
 
-        <div class="fixed bottom-0 left-0 bg-white rounded-xl mb-8  ml-[4rem] lg:ml-[7rem] z-[1000] text-xs p-2 font-inter cursor-pointer select-none hover:bg-[#d9dbdb]">
+        <div id="analytics_button" class="fixed bottom-0 left-0 bg-white rounded-xl mb-8  ml-[1rem] lg:ml-[7rem] z-[1000] text-xs p-2 font-inter cursor-pointer select-none hover:bg-[#d9dbdb]">
             <div class="w-fit flex space-x-2 items-center">
                 <img src="{% static 'img/analytics-graph-chart-svgrepo-com.png' %}" alt="" class="w-[0.7rem] h-[0.7rem] lg:w-[1rem] lg:h-[1rem]">
                 <span>Analytics</span>

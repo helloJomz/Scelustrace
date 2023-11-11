@@ -102,6 +102,39 @@ $(document).ready(function() {
 
 $(document).ready(function() {
 
+
+    $("#mobile_menu_button").click(function(){
+        $("#1st_btn").hide();
+        $("#2nd_btn").show();
+
+        $("#mobile-sidebar").toggle();
+
+        // Check if #mobile-sidebar is visible
+        var isOpen = $("#mobile-sidebar").is(":visible");
+
+        // Update the class on #mobile-sidebar
+        if (isOpen) {
+            $("#mobile-sidebar").addClass("opened").removeClass("closed");
+        } else {
+            $("#mobile-sidebar").addClass("closed").removeClass("opened");
+        }
+
+        // Update the class on #menu_wrapper_parent
+        if (isOpen) {
+            $("#menu_wrapper_parent").addClass("ms-[4rem]").removeClass("ms-[1rem]");
+            $("#analytics_button").addClass("ms-[4rem]").removeClass("ms-[1rem]");
+            $("#1st_btn").hide();
+            $("#2nd_btn").show();
+        } else {
+            $("#menu_wrapper_parent").addClass("ms-[1rem]").removeClass("ms-[4rem]");
+            $("#analytics_button").addClass("ms-[1rem]").removeClass("ms-[4rem]");
+            $("#1st_btn").show();
+            $("#2nd_btn").hide();
+        }
+       
+    })
+
+
     // Click event on the legend menu to show the legend container
     $("#legend-menu").click(function() {
         $(this).hide();

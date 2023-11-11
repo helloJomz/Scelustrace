@@ -365,8 +365,8 @@ def generate_marker_map():
         location        = df.iloc[itr]['location']
             
         html_popup = f"""
-                    <div style="margin-bottom: 1rem; user-select: none; font-family: 'Inter', sans-serif;" >
-                        <span style="background-color: {color}; padding-top: 0.25rem; padding-bottom: 0.25rem; padding-left: 0.5rem; padding-right: 0.5rem; letter-spacing: 0.1em; border-radius: 0.5rem; font-size: 0.75rem; color: #ffffff; font-weight: 600;" >{crime_type}</span>
+                    <div style="width: 100%; margin-bottom: 1rem; user-select: none; font-family: 'Inter', sans-serif;" >
+                        <span style="width: 100%; background-color: {color}; padding-top: 0.25rem; padding-bottom: 0.25rem; padding-left: 0.5rem; padding-right: 0.5rem; letter-spacing: 0.1em; border-radius: 0.5rem; font-size: 0.75rem; color: #ffffff; font-weight: 600;" >{crime_type}</span>
                     </div>
 
                     <div style="margin-bottom: 1rem;" >
