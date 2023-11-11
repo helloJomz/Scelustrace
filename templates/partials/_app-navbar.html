@@ -16,7 +16,7 @@
         <div class="hidden lg:block lg:relative ">
             <div class="lg:flex space-x-3 items-center bg-[#EDF1F2] pl-[1rem] pr-[0.4rem] py-[0.3rem] rounded-[3rem] cursor-pointer hover:bg-[#d9dbdb] select-none desktop-menu-toggle">
                 <div>
-                    <p class="font-space text-base font-bold m-0 ">{{ request.session.user_fullname | title }}</p>
+                    <p class="font-inter text-base font-semibold m-0 ">{{ request.session.user_fullname | title }}</p>
                 </div>
                 <div>
                     <img src=" {% if request.session.profile_img %} 
@@ -58,19 +58,11 @@
 
                         {% if request.session.status == True %}
                             <div class="bg-yellow-400 rounded-md py-[0.3rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer hover:bg-yellow-300">
-                                <p class="m-0 text-sm">Admin Dashboard</p>
+                                <p class="mx-auto text-sm text-center ">Admin Dashboard</p>
                             </div>
                         {% endif %}
     
-                        <div class="bg-[#E5E4E2] hover:brightness-90 rounded-md py-[0.2rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer ">
-                            <img src="{% static 'img/profile-default-svgrepo-com.png' %}" alt="profile" class="w-[1.2rem] h-[1.2rem]">
-                            <p class="m-0 text-base">Profile</p>
-                        </div>
-                
-                        <div class="bg-[#E5E4E2] hover:brightness-90 rounded-md py-[0.2rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer">
-                            <img src="{% static 'img/settings-2-svgrepo-com.png' %}" alt="profile" class="w-[1.2rem] h-[1.2rem]">
-                            <p class="m-0 text-base">Settings</p>
-                        </div>
+                        
                     </div>
                     
                     <form action=" {% url 'signout' %} " method="POST">

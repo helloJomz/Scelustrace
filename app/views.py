@@ -109,7 +109,11 @@ def process_fileupload(request):
                 chart_image = None
                 wordcloud_images = []  # List to store Word Cloud images
 
-                csv_file = request.FILES['csv_file']
+                csv_file = request.FILES.get('csv_file', None)
+
+                if not csv_file:
+                    return render(request, 'app/fileform.html', {'error': 'File Upload cannot be empty'})
+                
                 data = pd.read_csv(csv_file)
                 content_data = data['content']
                 vectorizer = TfidfVectorizer(stop_words='english')
@@ -450,25 +454,17 @@ def load_marker(request):
 def load_crime_analytics(request):
     data = pd.read_csv('./static/csv/gmanews.csv')
 
-    # lowercase
+    # Lowercase and strip
     data['location'] = data['location'].str.lower().str.strip()
 
     # Filter Quezon City
     qc_data = data[data['location'].str.contains('quezon city', case=False, na=False)]
 
-    # Group the filtered data by crime type and count the occurrences of each crime type
-    crime_counts = qc_data['crime'].value_counts()
-
     # Pie chart visualization
     plt.figure(figsize=(8, 8))
     colors = ['red', '#FFC000', '#FFF5EE', '#93C572', '#1434A4', '#800080'] 
+    crime_counts = qc_data['crime'].value_counts()
     plt.pie(crime_counts, labels=crime_counts.index, autopct='%1.1f%%', startangle=140, colors=colors)
-    plt.title('Index Crime Counts in Quezon City')
-
-    # for legend
-    legend_labels = [f'{crime} - {count}' for crime, count in zip(crime_counts.index, crime_counts)]
-    plt.legend(legend_labels, loc='best', fontsize='small')
-
     plt.title('Index Crime Counts in Quezon City')
 
     buffer = io.BytesIO()
@@ -486,10 +482,9 @@ def load_crime_analytics(request):
     # Remove year 2018
     qc_data = qc_data[qc_data['year'] != 2018]
 
-    crime_year = qc_data.pivot_table(index='year', columns='crime', aggfunc='size', fill_value=0)
-
     # Stacked Bar chart
     plt.figure(figsize=(10, 6))
+    crime_year = qc_data.groupby(['year', 'crime']).size().unstack(fill_value=0)
     crime_year.plot(kind='bar', stacked=True, colormap='Paired', ax=plt.gca())
     plt.title('Distribution of Crime Types in Quezon City per Year')
     plt.xlabel('Year')
@@ -503,7 +498,6 @@ def load_crime_analytics(request):
     buffer.seek(0)
     image2 = base64.b64encode(buffer.read()).decode()
     buffer.close()
-
 
     context = {
         'image1': "data:image/png;base64,"+image1, 
@@ -528,13 +522,10 @@ def load_crime_index(request):
     grouped_data['Total Index Crime'] = grouped_data.sum(axis=1)
 
     grouped_data.columns.name = ''
-
     grouped_data = grouped_data.reset_index()
 
-    grouped_data.index.name = None
-
     # Generate HTML table with Tailwind CSS classes and padding
-    table_html = f'''
+    table_html = '''
         <table class="table-auto border-collapse border border-slate-400 mx-auto my-5">
             <thead class="border border-slate-400 bg-slate-500 text-white">
                 <tr>
@@ -542,8 +533,7 @@ def load_crime_index(request):
     '''
 
     # Add crime type columns dynamically
-    for crime_type in grouped_data.columns[1:-1]:  # Exclude the first and last columns
-        table_html += f'                <th class="p-4">{crime_type}</th>\n'
+    table_html += "".join(['                <th class="p-4">{}</th>\n'.format(crime_type) for crime_type in grouped_data.columns[1:-1]])
 
     # Add more columns as needed
     table_html += '                <th class="p-4">Total Index Crime</th>\n'
@@ -552,11 +542,11 @@ def load_crime_index(request):
     # Iterate over rows and add data
     for _, row in grouped_data.iterrows():
         table_html += '            <tr>\n' 
-        table_html += f'                <td class="p-4 border border-slate-400 capitalize">{row["location"]}</td>\n'
-        for crime_type in grouped_data.columns[1:-1]:  # Exclude the first and last columns
-            table_html += f'                <td class="p-4 border border-slate-400 ">{row[crime_type]}</td>\n'
+        table_html += '                <td class="p-4 border border-slate-400 capitalize">{}</td>\n'.format(row["location"])
+        # Add crime type columns dynamically
+        table_html += "".join(['                <td class="p-4 border border-slate-400">{}</td>\n'.format(row[crime_type]) for crime_type in grouped_data.columns[1:-1]])
         # Add more columns as needed
-        table_html += f'                <td class="p-4 border border-slate-400 font-bold">{row["Total Index Crime"]}</td>\n'
+        table_html += '                <td class="p-4 border border-slate-400 font-bold">{}</td>\n'.format(row["Total Index Crime"])
         table_html += '            </tr>\n'
 
     # Close the HTML table
