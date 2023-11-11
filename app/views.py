@@ -428,10 +428,146 @@ def load_marker(request):
 
     return JsonResponse(context)
 
+@csrf_exempt
+def load_crime_analytics(request):
+    data = pd.read_csv('./static/csv/gmanews.csv')
+
+    # lowercase
+    data['location'] = data['location'].str.lower().str.strip()
+
+    # Filter Quezon City
+    qc_data = data[data['location'].str.contains('quezon city', case=False, na=False)]
+
+    # Group the filtered data by crime type and count the occurrences of each crime type
+    crime_counts = qc_data['crime'].value_counts()
+
+    # Pie chart visualization
+    plt.figure(figsize=(8, 8))
+    colors = ['red', '#FFC000', '#FFF5EE', '#93C572', '#1434A4', '#800080'] 
+    plt.pie(crime_counts, labels=crime_counts.index, autopct='%1.1f%%', startangle=140, colors=colors)
+    plt.title('Index Crime Counts in Quezon City')
+
+    # for legend
+    legend_labels = [f'{crime} - {count}' for crime, count in zip(crime_counts.index, crime_counts)]
+    plt.legend(legend_labels, loc='best', fontsize='small')
+
+    plt.title('Index Crime Counts in Quezon City')
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image1 = base64.b64encode(buffer.read()).decode()
+    buffer.close()
+
+    # Extract date info
+    qc_data['published_date'] = pd.to_datetime(qc_data['published_date'], format='%m/%d/%Y %H:%M')
+
+    # Extract the year and create new column
+    qc_data['year'] = qc_data['published_date'].dt.year
+
+    # Remove year 2018
+    qc_data = qc_data[qc_data['year'] != 2018]
+
+    crime_year = qc_data.pivot_table(index='year', columns='crime', aggfunc='size', fill_value=0)
+
+    # Stacked Bar chart
+    plt.figure(figsize=(10, 6))
+    crime_year.plot(kind='bar', stacked=True, colormap='Paired', ax=plt.gca())
+    plt.title('Distribution of Crime Types in Quezon City per Year')
+    plt.xlabel('Year')
+    plt.ylabel('Number of Crimes')
+    plt.grid(False)
+    plt.legend(title='Crime Type', loc='upper right')
+    plt.xticks(rotation=0)
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image2 = base64.b64encode(buffer.read()).decode()
+    buffer.close()
+
+
+    context = {
+        'image1': "data:image/png;base64,"+image1, 
+        'image2': "data:image/png;base64,"+image2
+    }
+
+    return JsonResponse(context)
+
+def load_crime_index(request):
+
+    # Assuming 'data' is a DataFrame
+    data = pd.read_csv('./static/csv/gmanews.csv')
+
+    # Lowercase and strip the 'location' column
+    data['location'] = data['location'].str.lower().str.strip()
+
+    # Filter Quezon City
+    qc_data = data[data['location'].str.contains('quezon city', case=False, na=False)]
+
+    # Group filtered data by location and crime type
+    grouped_data = qc_data.groupby(['location', 'crime']).size().unstack(fill_value=0)
+    grouped_data['Total Index Crime'] = grouped_data.sum(axis=1)
+
+    grouped_data.columns.name = ''
+
+    grouped_data = grouped_data.reset_index()
+
+    grouped_data.index.name = None
+
+    # Generate HTML table with Tailwind CSS classes and padding
+    table_html = f'''
+        <table class="table-auto border-collapse border border-slate-400 mx-auto my-5">
+            <thead class="border border-slate-400 bg-slate-500 text-white">
+                <tr>
+                    <th class="p-4">Location</th>
+    '''
+
+    # Add crime type columns dynamically
+    for crime_type in grouped_data.columns[1:-1]:  # Exclude the first and last columns
+        table_html += f'                <th class="p-4">{crime_type}</th>\n'
+
+    # Add more columns as needed
+    table_html += '                <th class="p-4">Total Index Crime</th>\n'
+    table_html += '            </tr>\n        </thead>\n        <tbody>\n'
+
+    # Iterate over rows and add data
+    for _, row in grouped_data.iterrows():
+        table_html += '            <tr>\n' 
+        table_html += f'                <td class="p-4 border border-slate-400 capitalize">{row["location"]}</td>\n'
+        for crime_type in grouped_data.columns[1:-1]:  # Exclude the first and last columns
+            table_html += f'                <td class="p-4 border border-slate-400 ">{row[crime_type]}</td>\n'
+        # Add more columns as needed
+        table_html += f'                <td class="p-4 border border-slate-400 font-bold">{row["Total Index Crime"]}</td>\n'
+        table_html += '            </tr>\n'
+
+    # Close the HTML table
+    table_html += '''
+            </tbody>
+        </table>
+    '''
+
+    # Add Tailwind CSS script to the HTML
+    script_code = '''
+        <script src="https://cdn.tailwindcss.com"></script>
+    '''
+
+    # Concatenate the script with the table HTML
+    table_html_with_script = table_html + script_code
+
+
+
+    context = {
+        'table_html': table_html_with_script
+    }
+
+    return JsonResponse(context)
 
 class AnalyticsView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'app/analytics.html')
+    
+
 
 
 

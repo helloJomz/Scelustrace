@@ -17,6 +17,8 @@ urlpatterns = [
     path('analytics/load_bubble/', views.load_bubble, name="bubble"),
     path('analytics/load_heatmap/', views.load_heatmap, name="heatmap"),
     path('analytics/load_marker/', views.load_marker, name="marker"),
+    path('analytics/load_crime_analytics/', views.load_crime_analytics, name="crime_analytics"),
+    path('analytics/load_crime_index/', views.load_crime_index, name="load_crime_index"),
 
     path('signout/', views.logout_and_clear_sessions, name="signout"),
     

@@ -172,4 +172,50 @@ $(document).ready(function() {
             $(this).addClass('bg-slate-200');
         }
     });
+
+    $("#analytics_button").click(function(){
+        $(this).hide()
+        $("#analytics-sidebar").removeClass("hidden")
+        $("#menu_wrapper_parent").addClass("hidden")
+
+        load_crime_analytics()
+    })
+
+    $("#close_analytics_chart").click(function(){
+        $("#analytics_button").show()
+        $("#analytics-sidebar").addClass("hidden")
+        $("#menu_wrapper_parent").removeClass("hidden")
+    })
+
+
+
+    function load_crime_analytics(){
+        $.ajax({
+            url: "load_crime_analytics/", 
+            method: "GET",
+            success: function(data) {
+
+                $("#image1").attr("src", data.image1);
+                $("#image2").attr("src", data.image2);
+               
+            
+            }
+        })
+    }
+
+    $("#view_crime_index").click(function(){
+        $.ajax({
+            url: "load_crime_index/", 
+            method: "GET",
+            success: function(data) {
+
+                var newWindow = window.open("", "_blank");
+                newWindow.document.write(data.table_html);
+                newWindow.document.title = "Scelustrace | Crime Index";
+            }
+        })
+    })
+
+
+
 });
