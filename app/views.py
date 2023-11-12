@@ -188,9 +188,9 @@ class ClusteringView(LoginRequiredMixin, View):
     
     def get(self, request):
         request.session["prev_page"] = request.path
-        context = cache.get('context_data')
-        if context:
-            return render(request, 'app/clustering.html', context)
+        cluster = cache.get('context_data')
+        if cluster:
+            return render(request, 'app/clustering.html', cluster)
         else:
             return render(request, 'app/fileform.html')
     
