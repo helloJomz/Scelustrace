@@ -93,8 +93,8 @@ def create_bar_chart(chart_data):
     plt.savefig(chart_buffer, format="png")
     plt.close()
 
-    chart_image = base64.b64encode(chart_buffer.getvalue()).decode('utf-8')
-    return chart_image
+    barchart_image = base64.b64encode(chart_buffer.getvalue()).decode('utf-8')
+    return barchart_image
 
 @login_required
 def process_fileupload(request):
@@ -106,7 +106,7 @@ def process_fileupload(request):
         if input_k.isdigit():
             if int(input_k) <= 13:
                 cluster_info = []  # List to store the cluster words
-                chart_image = None
+                barchart_image = None
                 wordcloud_images = []  # List to store Word Cloud images
 
                 csv_file = request.FILES.get('csv_file', None)
@@ -124,53 +124,51 @@ def process_fileupload(request):
 
                 if input_k and input_k.isdigit():
                     k = int(input_k)
+                    wordcloud_images = []
 
-                chart_image = None
-                wordcloud_images = []
+                    if k > 0:
+                        # Check if the clustering model is cached
+                        cached_model = cache.get('kmeans_model')
+                        if not cached_model:
+                            model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
+                            model.fit(X)
+                            # Cache the clustering model
+                            cache.set('kmeans_model', model, None)
+                        else:
+                            model = cached_model
 
-                if k > 0:
-                    # Check if the clustering model is cached
-                    cached_model = cache.get('kmeans_model')
-                    if not cached_model:
-                        model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
-                        model.fit(X)
-                        # Cache the clustering model
-                        cache.set('kmeans_model', model, None)
-                    else:
-                        model = cached_model
+                        data['cluster'] = model.labels_
 
-                    data['cluster'] = model.labels_
+                        # Loop for cluster result w/ 30 feature words
+                        for i in range(k):
+                            order_centroids = model.cluster_centers_.argsort()[:, ::-1]
+                            terms = vectorizer.get_feature_names_out()
+                            cluster_words = [terms[j] for j in order_centroids[i, :30]]
+                            cluster_info.append((f'Cluster {i}', cluster_words))
 
-                    # Loop for cluster result w/ 30 feature words
-                    for i in range(k):
-                        order_centroids = model.cluster_centers_.argsort()[:, ::-1]
-                        terms = vectorizer.get_feature_names_out()
-                        cluster_words = [terms[j] for j in order_centroids[i, :30]]
-                        cluster_info.append((f'Cluster {i}', cluster_words))
+                        # Word cloud generation (parallel processing)
+                        with concurrent.futures.ThreadPoolExecutor() as executor:
+                            wordcloud_futures = [executor.submit(generate_wordcloud, cluster_info[i][1], i) for i in range(k)]
 
-                    # Word cloud generation (parallel processing)
-                    with concurrent.futures.ThreadPoolExecutor() as executor:
-                        wordcloud_futures = [executor.submit(generate_wordcloud, cluster_info[i][1], i) for i in range(k)]
+                        wordcloud_images = [future.result() for future in wordcloud_futures]
 
-                    wordcloud_images = [future.result() for future in wordcloud_futures]
+                        # Create and save the bar chart of cluster points
+                        chart_data = data.groupby(['cluster'])['content'].count()
+                        barchart_image = create_bar_chart(chart_data)
 
-                    # Create and save the bar chart of cluster points
-                    chart_data = data.groupby(['cluster'])['content'].count()
-                    chart_image = create_bar_chart(chart_data)
+                        context = {
+                            'cluster_info': cluster_info,
+                            'barchart_image': barchart_image,
+                            'wordcloud_images': wordcloud_images,
+                            'dataset_name': csv_file.name,
+                            'col_count': data.shape[1] - 1,
+                            'row_count': data.shape[0],
+                        }
 
-                    context = {
-                        'cluster_info': cluster_info,
-                        'chart_image': chart_image,
-                        'wordcloud_images': wordcloud_images,
-                        'dataset_name': csv_file.name,
-                        'col_count': data.shape[1] - 1,
-                        'row_count': data.shape[0],
-                    }
+                        # Cache the context data
+                        cache.set('context_data', context, None)
 
-                    # Cache the context data
-                    cache.set('context_data', context, None)
-
-                    return redirect('clustering')
+                        return redirect('clustering')
             else:
                 return render(request, 'app/fileform.html', {'error': 'The Number of K should not exceed 13!'})
         else:
