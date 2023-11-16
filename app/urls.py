@@ -11,6 +11,7 @@ urlpatterns = [
     path('revamp/', RevampView.as_view(), name="revamp"),
     path('revamp/load_user_table/', views.load_user_table, name="load_user_table"),
     path('revamp/search_user_table/', views.search_user_table, name="search_user_table"),
+    path('revamp/del_user/', views.del_user, name="del_user"),
 
     path('analytics/', AnalyticsView.as_view(), name="analytics"),
     path('analytics/load_bubble/', views.load_bubble, name="bubble"),

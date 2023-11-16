@@ -100,7 +100,7 @@ def search_user_table(request):
     search = request.POST.get("search")
     
     # Use Q objects for a wildcard search on first_name and last_name
-    user = User.objects.filter(Q(first_name__icontains=search) | Q(last_name__icontains=search)).first()
+    user = User.objects.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search)).first()
 
     if user:
         user_profile = UserProfile.objects.get(id=user.id)
@@ -117,6 +117,16 @@ def search_user_table(request):
         return JsonResponse({'users': user_data})
     else:
         return JsonResponse({'users': 'none'})
+    
+@csrf_exempt
+def del_user(request):
+    id = request.POST.get("id")
+    user = User.objects.filter(id=id)
+    if user:
+        user.delete()
+        return JsonResponse({'msg': 'deleted'})
+    else:
+        return JsonResponse({'msg': 'none'})
 
 class RevampView(LoginRequiredMixin, View):
     def get(self, request):

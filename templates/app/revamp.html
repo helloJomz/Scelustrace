@@ -21,7 +21,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://kit.fontawesome.com/4d385404a7.js" crossorigin="anonymous"></script>
     
-
 </head>
 
 <body class="h-screen font-inter " >
@@ -39,12 +38,12 @@
             
             <div class="flex space-x-8">
                 <div class="hidden text-xs lg:block lg:flex lg:text-sm font-semibold text-slate-700  space-x-5 lg:space-x-10 items-center">
-                    <a href="#" class="hover:text-sky-500">
+                    <a href="{% url 'classification' %}" class="hover:text-sky-500">
                         <div>
                             <span>Classification</span>
                         </div>
                     </a>
-                    <a href="#" class="hover:text-sky-500">
+                    <a href="{% url 'analytics' %}" class="hover:text-sky-500">
                         <div>
                             <span>Crime Analytics</span>
                         </div>
@@ -61,7 +60,7 @@
                         <div class=" py-2 font-inter text-sm h-full ">
                             <div id="signout__btn" class="w-full ">
                                 <div class="px-3 text-white flex justify-between items-center mt-[70%] hover:bg-sky-500 w-full py-1" >
-                                    <div class="flex space-x-3 items-center">
+                                    <div class="flex space-x-3 items-center select-none cursor-pointer">
                                         <i class="fa-solid fa-right-from-bracket"></i>
                                         <p>Log out</p>
                                     </div>
@@ -161,15 +160,15 @@
                     <input id="search__user" type="text" placeholder="Search..." class="px-2 text-sm border border-slate-300 rounded-lg py-1">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
-                <div class="grid grid-cols-5 gap-4 text-sm font-semibold border-light py-2">
+                <div class="grid grid-cols-4 lg:grid-cols-5 gap-1 text-xs lg:text-sm font-semibold border-light py-2">
                     <div>IMG</div>
-                    <div>NAME</div>
+                    <div class="hidden lg:block">NAME</div>
                     <div>USERNAME</div>
                     <div>STATUS</div>
-                    <div></div>
+                    <div>BTN</div>
                 </div>
                 
-                <div id="span__users" class="h-[30rem] overflow-y-auto">
+                <div id="span__users" class="h-[30rem] overflow-y-auto ">
                 </div>
             </div>
             
