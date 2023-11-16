@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block 'title' %}Naive Bayes{% endblock %}
-{% block 'ml_num' %}Machine Learning 1{% endblock %}
+{% block 'algo_type' %}Crime Classification{% endblock %}
 {% block 'model' %}Naive Bayes{% endblock %}
 {% block 'model_title' %}Naive Bayes{% endblock %}
 {% block 'algorithm_type' %}Classification Algorithm{% endblock %}
@@ -112,8 +112,9 @@
             
             <div class="hidden my-5" id="result_container">
                 <div id="result_error_alert" class="hidden bg-[#EDF1F2] w-2/3 h-[12rem] p-5 space-y-4 rounded-lg">
-                    <div>
+                    <div class="flex space-x-3 items-center">
                         <span id="predicted_label" class="rounded-lg bg-red-600 py-[0.2rem] px-[0.5rem] text-white font-space w-fit text-center text-sm select-none">Violent Crime</span>
+                        <span id="predicted_accuracy" class="italic text-xs"></span>
                     </div>
 
                     <div class="h-[70%] overflow-y-auto text-sm ">
@@ -137,78 +138,9 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 {% block sidebar2 %}
 
     <div class="flex flex-col h-full gap-8 ">
-        <div class="h-full lg:h-fit border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem] space-y-1">
-            <div class="flex justify-between items-center">
-                <div class="font-space font-bold flex space-x-3 items-center">
-                    <img src="{% static 'img/black_ml.png' %}" alt="" class="w-[1rem] h-[1rem]">
-                    <p class="m-0 text-base">Model:</p>
-                </div>
-                
-                <div class="font-inter text-xs">
-                    <span>Naive Bayes</span>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-center">
-                <div class="font-space font-bold flex space-x-3 items-center">
-                    <img src="{% static 'img/dataset_logo.png' %}" alt="" class="w-[1rem] h-[1rem]">
-                    <p class="m-0 text-base">Dataset:</p>
-                </div>
-                
-                <div class="font-inter text-xs">
-                    <span>gmanews.csv</span>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-center">
-                <div class="font-space font-bold flex space-x-3 items-center">
-                    <img src="{% static 'img/dataset_count.png' %}" alt="" class="w-[1rem] h-[1rem]">
-                    <p class="m-0 text-base">Dataset Count:</p>
-                </div>
-                
-                <div class="font-inter text-xs">
-                    <span>2500</span>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-center">
-                <div class="font-space font-bold flex space-x-3 items-center">
-                    <img src="{% static 'img/dumbell.png' %}" alt="" class="w-[1rem] h-[1rem] object-fit">
-                    <p class="m-0 text-base">Training Size:</p>
-                </div>
-                
-                <div class="font-inter text-xs">
-                    <span>90%</span>
-                </div>
-            </div>
-
-            <div class="flex justify-between items-center">
-                <div class="font-space font-bold flex space-x-3 items-center">
-                    <img src="{% static 'img/dumbell.png' %}" alt="" class="w-[1rem] h-[1rem] object-fit">
-                    <p class="m-0 text-base">Test Size:</p>
-                </div>
-                
-                <div class="font-inter text-xs">
-                    <span>10%</span>
-                </div>
-            </div>
-        </div>
-
         <div class="h-fit border border-solid border-1 border-[#D3D3D3] rounded-lg p-[1.5rem] text-xs ">
             
             <div class="mb-7 text-base font-space font-bold flex space-x-3 items-center">

@@ -42,7 +42,7 @@
             </div>
     
             <div class="flex space-x-2 text-[#8F8F8F]">
-                <span>{% block 'ml_num' %}Machine Learning # {% endblock  %}</span>
+                <span>{% block 'algo_type' %}Crime Classification {% endblock  %}</span>
                 <span>/</span>
             </div>
     
@@ -78,7 +78,7 @@
             </div>
             
             {% block cf_main %}{% endblock cf_main %}
-            {% block cl_main %}{% endblock cl_main %}
+
         </main>
 
         <div id="sidebar-1" class="
@@ -91,7 +91,6 @@
                 {% include 'partials/_app-sidebar-haft.html' %}
 
                 {% block cf_sidebar1 %}{% endblock cf_sidebar1 %}
-                {% block cl_sidebar1 %}{% endblock cl_sidebar1 %}
             </div>
             
         </div>
@@ -112,7 +111,6 @@
                 {% endif %}
             ">
                 {% block sidebar2 %}{% endblock sidebar2 %}
-                {% block cl_sidebar2 %}{% endblock cl_sidebar2 %}
             </div>
            
         </div>

@@ -7,20 +7,13 @@ from joblib import load
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
-from django.http import HttpResponseRedirect
 
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
 import io
 import matplotlib.pyplot as plt
-from io import BytesIO
 import base64
-from wordcloud import WordCloud
 import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor
 from django.views.decorators.csrf import csrf_exempt
-from cachetools import cached, TTLCache
 
 
 import matplotlib
@@ -29,6 +22,10 @@ matplotlib.use('Agg')
 import folium
 from folium.plugins import HeatMap, MarkerCluster
 from branca.element import Figure
+
+from django.contrib.auth.models import User
+from .models import UserProfile
+from django.db.models import Q
 
 class ClassificationView(LoginRequiredMixin, View):
 
@@ -54,6 +51,9 @@ class ClassificationView(LoginRequiredMixin, View):
         y_pred_label        = label_encoder.inverse_transform(y_pred)
         predicted_label     = y_pred_label[0] if y_pred_label else ''
 
+        proba = nb_classifier.predict_proba(input_tfidf)
+        accuracy_percentage = round(max(proba[0]) * 100, 2)
+
         result = {}  
         list_of_crimes = ListOfCrimes.objects.all()
 
@@ -62,136 +62,99 @@ class ClassificationView(LoginRequiredMixin, View):
                 result = {
                     'predicted_label': crime.label_crime,
                     'bg_color': crime.bg_color,
-                    'desc': crime.desc
+                    'desc': crime.desc,
+                    'accuracy': accuracy_percentage,
                 }
         return JsonResponse(result)
+
+@csrf_exempt    
+def load_user_table(request):
+    # Query the first 10 users
+    first_10_users = User.objects.all()[:10]
+
+    # Convert the user data to a list of dictionaries
+    user_list = []
+    for user in first_10_users:
+        try:
+            user_profile = UserProfile.objects.get(id=user.id)
+            image_filename = user_profile.profile_image_filename
+        except UserProfile.DoesNotExist:
+            image_filename = '9.png'
+
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'firstname': user.first_name,
+            'lastname': user.last_name,
+            'status': 'Staff' if user.is_staff else 'Member',
+            'image_filename': image_filename,
+        }
+        user_list.append(user_data)
+
+    # Return the user information as JSON response
+    return JsonResponse({'users': user_list})
+
+@csrf_exempt
+def search_user_table(request):
+    search = request.POST.get("search")
     
-@login_required
-def load_fileupload(request):
-    request.session["prev_page"] = request.path
-    return render(request, 'app/fileform.html')
-        
-    
+    # Use Q objects for a wildcard search on first_name and last_name
+    user = User.objects.filter(Q(first_name__icontains=search) | Q(last_name__icontains=search)).first()
 
-
-def generate_wordcloud(cluster_words, cluster_number):
-    wordcloud = WordCloud(width=400, height=400, background_color='white')
-    wordcloud.generate_from_text(' '.join(cluster_words))
-    image_data = io.BytesIO()
-    wordcloud.to_image().save(image_data, format="PNG")
-    image_base64 = base64.b64encode(image_data.getvalue()).decode('utf-8')
-    return f'Cluster {cluster_number}', image_base64
-
-
-def create_bar_chart(chart_data):
-    plt.bar(chart_data.index, chart_data.values, alpha=0.4)
-    plt.title('KMeans cluster points')
-    plt.xlabel("Cluster number")
-    plt.ylabel("Number of points")
-
-    chart_buffer = BytesIO()
-    plt.savefig(chart_buffer, format="png")
-    plt.close()
-
-    barchart_image = base64.b64encode(chart_buffer.getvalue()).decode('utf-8')
-    return barchart_image
-
-@login_required
-def process_fileupload(request):
-    # Delete the first cache
-    cache.delete('context_data')
-    input_k = request.POST.get('input_k', '')
-
-    if input_k:
-        if input_k.isdigit():
-            if int(input_k) <= 13:
-                cluster_info = []  # List to store the cluster words
-                barchart_image = None
-                wordcloud_images = []  # List to store Word Cloud images
-
-                csv_file = request.FILES.get('csv_file', None)
-
-                if not csv_file:
-                    return render(request, 'app/fileform.html', {'error': 'File Upload cannot be empty'})
-                
-                data = pd.read_csv(csv_file)
-                content_data = data['content']
-                vectorizer = TfidfVectorizer(stop_words='english')
-                X = vectorizer.fit_transform(content_data)
-
-
-                k = 0  # Default value
-
-                if input_k and input_k.isdigit():
-                    k = int(input_k)
-                    wordcloud_images = []
-
-                    if k > 0:
-                        # Check if the clustering model is cached
-                        cached_model = cache.get('kmeans_model')
-                        if not cached_model:
-                            model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=1, random_state=462)
-                            model.fit(X)
-                            # Cache the clustering model
-                            cache.set('kmeans_model', model, None)
-                        else:
-                            model = cached_model
-
-                        data['cluster'] = model.labels_
-
-                        # Loop for cluster result w/ 30 feature words
-                        for i in range(k):
-                            order_centroids = model.cluster_centers_.argsort()[:, ::-1]
-                            terms = vectorizer.get_feature_names_out()
-                            cluster_words = [terms[j] for j in order_centroids[i, :30]]
-                            cluster_info.append((f'Cluster {i}', cluster_words))
-
-                        # Word cloud generation (parallel processing)
-                        with concurrent.futures.ThreadPoolExecutor() as executor:
-                            wordcloud_futures = [executor.submit(generate_wordcloud, cluster_info[i][1], i) for i in range(k)]
-
-                        wordcloud_images = [future.result() for future in wordcloud_futures]
-
-                        # Create and save the bar chart of cluster points
-                        chart_data = data.groupby(['cluster'])['content'].count()
-                        barchart_image = create_bar_chart(chart_data)
-
-                        context = {
-                            'cluster_info': cluster_info,
-                            'barchart_image': barchart_image,
-                            'wordcloud_images': wordcloud_images,
-                            'dataset_name': csv_file.name,
-                            'col_count': data.shape[1] - 1,
-                            'row_count': data.shape[0],
-                        }
-
-                        # Cache the context data
-                        cache.set('context_data', context, None)
-
-                        return redirect('clustering')
-            else:
-                return render(request, 'app/fileform.html', {'error': 'The Number of K should not exceed 13!'})
-        else:
-            return render(request, 'app/fileform.html', {'error': 'The Number of K should be numbers only!'})
+    if user:
+        user_profile = UserProfile.objects.get(id=user.id)
+        image_filename = user_profile.profile_image_filename if user_profile.profile_image_filename else '9.png'
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'firstname': user.first_name,
+            'lastname': user.last_name,
+            'status': 'Staff' if user.is_staff else 'Member',
+            'image_filename': image_filename,  
+        }
+        return JsonResponse({'users': user_data})
     else:
-        return render(request, 'app/fileform.html', {'error': 'The Number of K should not be empty!'})
+        return JsonResponse({'users': 'none'})
 
-    
-
-class ClusteringView(LoginRequiredMixin, View):
-    def dispatch(self, request, *args, **kwargs):
-        # Set the previous page URL in the session
-        request.session["prev_page"] = request.path
-        return super().dispatch(request, *args, **kwargs)
-    
+class RevampView(LoginRequiredMixin, View):
     def get(self, request):
-        request.session["prev_page"] = request.path
-        cluster = cache.get('context_data')
-        if cluster:
-            return render(request, 'app/clustering.html', cluster)
-        else:
-            return render(request, 'app/fileform.html')
-    
+        return render(request, 'app/revamp.html')
+
+    def post(self, request):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def create_circle_marker(latVal, longVal, color):

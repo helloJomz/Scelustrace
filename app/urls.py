@@ -1,4 +1,4 @@
-from .views import ClassificationView, ClusteringView, AnalyticsView
+from .views import ClassificationView, AnalyticsView, RevampView
 from django.urls import path
 from . import views
 
@@ -8,10 +8,9 @@ urlpatterns = [
     path('', ClassificationView.as_view(), name="classification"),
     path('classification/', ClassificationView.as_view(), name="classification"),
 
-
-    path('fileupload/', views.load_fileupload, name="fileupload"),
-    path('process_fileupload/', views.process_fileupload, name="process_fileupload"),
-    path('clustering/', ClusteringView.as_view(), name="clustering"),
+    path('revamp/', RevampView.as_view(), name="revamp"),
+    path('revamp/load_user_table/', views.load_user_table, name="load_user_table"),
+    path('revamp/search_user_table/', views.search_user_table, name="search_user_table"),
 
     path('analytics/', AnalyticsView.as_view(), name="analytics"),
     path('analytics/load_bubble/', views.load_bubble, name="bubble"),

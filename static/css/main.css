@@ -20,6 +20,16 @@
     border-bottom: 1px solid #d3d3d3;
 }
 
+.border-left-light {
+    border-left: 1px solid #d3d3d3;
+}
+
+.border-x-light {
+    border-left: 1px solid #d3d3d3;
+    border-right: 1px solid #d3d3d3;
+}
+
+
 .has-mask {
     position: absolute;
     clip: rect(10px, 150px, 130px, 10px);

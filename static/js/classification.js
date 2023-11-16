@@ -92,6 +92,7 @@ $(document).ready(function(){
                                 $("#empty_result").hide()
                                 $("#result_error_alert").show()
                                 $("#predicted_label").show().text(data.predicted_label).css("background-color", data.bg_color)
+                                $("#predicted_accuracy").text(data.accuracy + "% Accuracy")
                                 $("#crime_desc").text(data.desc)
         
                             }, 1000);

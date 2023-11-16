@@ -57,7 +57,8 @@
                         </div>
 
                         {% if request.session.status == True %}
-                            <div class="bg-yellow-400 rounded-md py-[0.3rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer hover:bg-yellow-300">
+                            <div class="bg-yellow-400 rounded-md py-[0.3rem] px-[0.4rem] flex space-x-3 items-center cursor-pointer hover:bg-yellow-300"
+                                onclick="window.location.href = '/admin/dashboard';">
                                 <p class="mx-auto text-sm text-center ">Admin Dashboard</p>
                             </div>
                         {% endif %}
