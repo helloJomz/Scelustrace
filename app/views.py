@@ -128,12 +128,16 @@ def del_user(request):
     else:
         return JsonResponse({'msg': 'none'})
 
-class RevampView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'app/revamp.html')
 
-    def post(self, request):
-        pass
+
+@login_required
+def account_management(request):
+        return render(request, 'app/account_management.html')
+
+@login_required
+def activity_logs(request):
+        return render(request, 'app/activity_logs.html')
+
 
 
 

@@ -1,0 +1,25 @@
+
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block 'title' %}Account Management{% endblock  %}
+{% block 'tab_title' %}Account Management{% endblock  %}
+
+{% block 'main' %}
+    <div class="lg:pt-[4rem] ">
+        <div class="flex justify-end mb-2 space-x-2 items-center">
+            <input id="search__user" type="text" placeholder="Search..." class="px-2 text-sm border border-slate-300 rounded-lg py-1">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div class="grid grid-cols-4 lg:grid-cols-5 gap-1 text-xs lg:text-sm font-semibold border-light py-2">
+            <div>IMG</div>
+            <div class="hidden lg:block">NAME</div>
+            <div>USERNAME</div>
+            <div>STATUS</div>
+            <div>ACTION</div>
+        </div>
+        
+        <div id="span__users" class="h-[30rem] overflow-y-auto ">
+        </div>
+        <script src="{% static 'js/usermgt__table.js' %}"></script>
+    </div>
+{% endblock  %}

@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scelustrace | </title>
+    <title>Scelustrace | {% block 'tab_title' %}Title{% endblock  %} </title>
 
     <!-- DEPENDENCIES -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -104,8 +104,28 @@
                     </div>
         
                     <div class="text-xs">
-                        <div class="bg-sky-200 py-3">
-                            <button class="px-3">
+                        <div class="
+                            py-3
+                            {% if 'account_management' in request.path %}
+                                bg-sky-200
+                            {% elif request.path == '/app/admin/' %}
+                                bg-white
+                                hover:bg-sky-200
+                            {% else %}
+                                bg-white
+                                hover:bg-slate-200
+                            {% endif %}
+
+                            ">
+                            <button class="px-3"
+
+                                {% if 'account_management' not in request.path %}
+                                    onclick="window.location.href = '/app/admin/account_management';"
+                                {% elif 'admin' not in request.path %}
+                                    onclick="window.location.href = '/app/admin/account_management';"
+                                {% endif %}
+                        
+                            >
                                 Account Management
                             </button>
                         </div>
@@ -114,8 +134,19 @@
                                 Manage Dataset
                             </button>
                         </div>
-                        <div>
-                            <button  class="px-3 py-3">
+                        <div class="
+                            {% if 'activity_logs' in request.path %}
+                                bg-sky-200
+                            {% else %}
+                                hover:bg-slate-200
+                            {% endif %}
+                        "
+                        >
+                            <button  class="px-3 py-3"
+                                {% if 'activity_logs' not in request.path %}
+                                    onclick="window.location.href = '/app/admin/activity_logs';"
+                                {% endif %}
+                            >
                                 Activity Logs
                             </button>
                         </div>
@@ -152,31 +183,17 @@
 
         <div class="lg:mt-[2rem] px-3 lg:p-0 w-full font-inter space-y-5 rounded-sm">
             <div class="mt-16 rounded-sm py-2 ">
-                <p class="font-semibold text-lg">Account Management</p>
+                <p class="font-semibold text-lg">{% block 'title' %}Title{% endblock  %}</p>
             </div>
 
-            <div class="lg:pt-[4rem] ">
-                <div class="flex justify-end mb-2 space-x-2 items-center">
-                    <input id="search__user" type="text" placeholder="Search..." class="px-2 text-sm border border-slate-300 rounded-lg py-1">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <div class="grid grid-cols-4 lg:grid-cols-5 gap-1 text-xs lg:text-sm font-semibold border-light py-2">
-                    <div>IMG</div>
-                    <div class="hidden lg:block">NAME</div>
-                    <div>USERNAME</div>
-                    <div>STATUS</div>
-                    <div>BTN</div>
-                </div>
-                
-                <div id="span__users" class="h-[30rem] overflow-y-auto ">
-                </div>
-            </div>
+            {% block 'main' %}{% endblock  %}
+            
             
         </div>
     </div>
     
 
-    <script src="{% static 'js/usermgt__table.js' %}"></script>
+    
     <script>
 
         $("#mobile__menu__btn").click(function (event) {
