@@ -63,7 +63,8 @@
 
                 {% if request.session.status == True %}
                     <div class="font-space bg-yellow-400 rounded-md h-[4rem] py-[1rem] px-[1.5rem] flex space-x-5 
-                                items-center cursor-pointer hover:bg-yellow-300">
+                                items-center cursor-pointer hover:bg-yellow-300"
+                                onclick="window.location.href = '/app/admin/account_management';">
                         <img src="{% static 'img/tools-f-svgrepo-com.png' %}" alt="admin" class="w-[2rem] h-[2rem]">
                         <p class=" text-base ">Admin Dashboard</p>
                     </div>
