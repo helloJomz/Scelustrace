@@ -3,11 +3,13 @@
 <header class="flex-1 z-30">
   <nav class="pt-14 flex justify-between font-inter font-medium mx-12 md:mx-24">
     <div class="md:flex md:space-x-10 md:items-center">
-      <div class="cursor-pointer hidden md:block">
-        <img src="{% static 'img/brand_logo_scelustrace.png' %}" alt="" class="w-30 lg:w-64 h-8" />
+      <div class="cursor-pointer hidden md:block" onclick="window.location.href = '/';">
+        <img src="{% static 'img/brand_logo_scelustrace.png' %}" alt="" class="w-30 lg:w-64 h-8" 
+        />
       </div>
-      <div class="cursor-pointer  flex justify-center items-center block md:hidden h-full">
-        <img src="{% static 'img/secondary_logo.png' %}" class="w-30 h-4" alt="" />
+      <div class="cursor-pointer  flex justify-center items-center block md:hidden h-full" onclick="window.location.href = '/';">
+        <img src="{% static 'img/secondary_logo.png' %}" class="w-30 h-4" alt=""
+        />
       </div>
 
       <div class="hidden lg:block">

@@ -1,3 +1,12 @@
+
+$(document).ready(function(){
+    Swal.fire({
+        title: "Data Privacy Act of 2012",
+        text: "Aligned with the Data Privacy Act of 2012, we guarantee that all information provided during the user registration on our web application will be handled with the highest level of confidentiality. The data will be exclusively utilized for academic purposes. Be assured that any information collected will not be revealed, shared, or utilized for any purpose beyond this academic research without your explicit consent.",
+      });
+})
+
+
 function signup_user() {
 
     const inputFields       = $('#signup_user input[type="text"], #signup_user input[type="password"]');
