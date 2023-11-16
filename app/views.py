@@ -76,7 +76,7 @@ def load_user_table(request):
     user_list = []
     for user in first_10_users:
         try:
-            user_profile = UserProfile.objects.get(id=user.id)
+            user_profile = UserProfile.objects.get(user=user)
             image_filename = user_profile.profile_image_filename
         except UserProfile.DoesNotExist:
             image_filename = '9.png'
@@ -103,7 +103,7 @@ def search_user_table(request):
     user = User.objects.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search)).first()
 
     if user:
-        user_profile = UserProfile.objects.get(id=user.id)
+        user_profile = UserProfile.objects.get(user=user)
         image_filename = user_profile.profile_image_filename if user_profile.profile_image_filename else '9.png'
         user_data = {
             'id': user.id,

@@ -60,10 +60,13 @@
                         <div class=" py-2 font-inter text-sm h-full ">
                             <div id="signout__btn" class="w-full ">
                                 <div class="px-3 text-white flex justify-between items-center mt-[70%] hover:bg-sky-500 w-full py-1" >
-                                    <div class="flex space-x-3 items-center select-none cursor-pointer">
-                                        <i class="fa-solid fa-right-from-bracket"></i>
-                                        <p>Log out</p>
-                                    </div>
+                                    <form action=" {% url 'signout' %} " method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="flex space-x-3 items-center select-none cursor-pointer">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                            <p>Log out</p>
+                                        </button>
+                                    </form>
                                     <div>
                                         <i class="fas fa-chevron-right text-xs"></i>
                                     </div>
